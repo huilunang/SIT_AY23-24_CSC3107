@@ -1,0 +1,90 @@
+---
+title: "CSC3107_Assignment_Seashell"
+format: html
+editor: visual
+---
+
+# 1. Introduction
+
+## a. Background
+
+The chosen visualization to critique is on the world's contribution to climate impact. The target news article is [here](https://edition.cnn.com/interactive/2023/12/us/countries-climate-change-emissions-cop28/).
+
+The news article aims to convey the impacts if the current situation remains unchanged and the amount effort needed to be put in by specific countries to help cut climate pollution.
+
+## b. Appreciated Aspects
+
+1.  The use of a dynamic bubble chart to emphasise on rankings to visualise on the leading countries’ emission contributions in 2022
+2.  The timeline graph shown in the visualization makes use of future predictions by 2030 to show the CO2 estimated emissions by country. The height of the charts albeit difficult to see due to the CSS, is to scale for their specific unit.
+3.  The visualization uses different hues of the same red colour to describe the intensity of the data.
+
+## c. Problematic Aspects
+
+### i. Bubble Chart
+
+1.  The chart does not provide a legend for the measurement metrics used. It is unclear what the size of the bubble represents.
+2.  The chart does not provide a clear ranking of the top 20 countries’ emission contributions. It is hard to differentiate the mid-range sizes.
+
+### ii. Horizontal Bar Chart
+
+1.  It did not specify the type of emission that is required for reduction. Stating as total or per capita emission will convey different meaning of what action that country should take to reduce them. For instance, per capita will be revamping individuals lifestyle such as the current change of adopting EVs. Total will be introducing industry standard policies that affects industrial sectors like transportation.
+2.  Horizontal bar chart shows misleading information that Nigeria should contribute more to the greenhouse gases emission. The red colour for both sides also contributes to the misled of information.
+
+## d. Points for Improvement
+
+1.  More numerical figures and labels could be used with the bubble chart and graphs to convey the content more effectively at a glance.
+2.  A historical chart of the top countries contribution to climate impact can be shown thus identifying the actions taken by them to reduce global emissions.
+3.  Provide a legend for the bubble chart to show the size of the bubble represents the amount of emissions.
+4.  (Feedback)
+
+-   Use world map to represent the data
+-   Highlight top 10 (label countries)
+-   Show 2 world maps to show current emission, and the other to show countries who should reduce emission in GHG
+
+## e. Publicly Available Data
+
+### i. Climate Watch Data
+
+1. Limited data till 2020 (able to filter by sectors contribution, gases, countries, etc): [Climate Watch Data](https://www.climatewatchdata.org/ghg-emissions?breakBy=sector&regions=BRN%2CKHM%2CIDN%2CLAO%2CMYS%2CMMR%2CPHL%2CSGP%2CTHA%2CVNM&sectors=agriculture%2Cbunker-fuels%2Cindustrial-processes%2Cland-use-change-and-forestry%2Cwaste%2Cenergy&source=Climate%20Watch)
+
+### ii. Climate Action Tracker
+
+1. Able to filter by sector and various indicators, this video explains on the different tool provided. Limited data of Southeast Asia countries, can look into changing focus to worldwide contributors: [Climate Action Tracker](https://climateactiontracker.org/cat-data-explorer/sector-indicators/?sector=Transport%20Road&indicator=EV%20stock%20shares&country=SGP&country=IDN&country=PHL&scenario=benchmark&scenario=projected_current_policy&mode=countries)
+
+### iii. Our World in Data
+
+1. [Github Bank](https://github.com/owid/co2-data?tafb=readme-ov-file)
+2. [Total GHG](https://ourworldindata.org/grapher/total-ghg-emissions)
+3. [Per Capita GHG](https://ourworldindata.org/grapher/per-capita-ghg-excl-land-use)
+
+
+### iv. EPA
+
+1. Interactive and various form to visualize data and charts: [EPA](https://www.epa.gov/ghgreporting/ghgrp-reported-data)
+
+# 2. Data Collection and Preprocessing
+
+## a. Import
+
+```{r}
+#| echo: false
+
+```
+
+## b. Clean
+
+```{r}
+#| echo: false
+
+```
+
+## c. Process
+
+# 3. Visualization
+
+## a. World Emission Chart using World Map
+
+```{r}
+#| echo: false
+
+```
