@@ -69,6 +69,15 @@ The news article aims to convey the impacts if the current situation remains unc
 ```{r}
 #| echo: false
 
+# Read the CSV file
+totalGHG <- read.csv("total_ghg_dataset.csv")
+
+# Rename the column containing GHG emissions
+colnames(totalGHG)[colnames(totalGHG) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "Total C02 Emissions (t)"
+
+# View the dataset with the renamed column
+print(totalGHG, row.names = FALSE)
+
 ```
 
 ## b. Clean
