@@ -45,26 +45,41 @@ The news article aims to convey the impacts if the current situation remains unc
 
 ### i. Climate Watch Data
 
-1. Limited data till 2020 (able to filter by sectors contribution, gases, countries, etc): [Climate Watch Data](https://www.climatewatchdata.org/ghg-emissions?breakBy=sector&regions=BRN%2CKHM%2CIDN%2CLAO%2CMYS%2CMMR%2CPHL%2CSGP%2CTHA%2CVNM&sectors=agriculture%2Cbunker-fuels%2Cindustrial-processes%2Cland-use-change-and-forestry%2Cwaste%2Cenergy&source=Climate%20Watch)
+1.  Limited data till 2020 (able to filter by sectors contribution, gases, countries, etc): [Climate Watch Data](https://www.climatewatchdata.org/ghg-emissions?breakBy=sector&regions=BRN%2CKHM%2CIDN%2CLAO%2CMYS%2CMMR%2CPHL%2CSGP%2CTHA%2CVNM&sectors=agriculture%2Cbunker-fuels%2Cindustrial-processes%2Cland-use-change-and-forestry%2Cwaste%2Cenergy&source=Climate%20Watch)
 
 ### ii. Climate Action Tracker
 
-1. Able to filter by sector and various indicators, this video explains on the different tool provided. Limited data of Southeast Asia countries, can look into changing focus to worldwide contributors: [Climate Action Tracker](https://climateactiontracker.org/cat-data-explorer/sector-indicators/?sector=Transport%20Road&indicator=EV%20stock%20shares&country=SGP&country=IDN&country=PHL&scenario=benchmark&scenario=projected_current_policy&mode=countries)
+1.  Able to filter by sector and various indicators, this video explains on the different tool provided. Limited data of Southeast Asia countries, can look into changing focus to worldwide contributors: [Climate Action Tracker](https://climateactiontracker.org/cat-data-explorer/sector-indicators/?sector=Transport%20Road&indicator=EV%20stock%20shares&country=SGP&country=IDN&country=PHL&scenario=benchmark&scenario=projected_current_policy&mode=countries)
 
 ### iii. Our World in Data
 
-1. [Github Bank](https://github.com/owid/co2-data?tafb=readme-ov-file)
-2. [Total GHG](https://ourworldindata.org/grapher/total-ghg-emissions)
-3. [Per Capita GHG](https://ourworldindata.org/grapher/per-capita-ghg-excl-land-use)
-
+1.  [Github Bank](https://github.com/owid/co2-data?tafb=readme-ov-file)
+2.  [Total GHG](https://ourworldindata.org/grapher/total-ghg-emissions)
+3.  [Per Capita GHG](https://ourworldindata.org/grapher/per-capita-ghg-excl-land-use)
 
 ### iv. EPA
 
-1. Interactive and various form to visualize data and charts: [EPA](https://www.epa.gov/ghgreporting/ghgrp-reported-data)
+1.  Interactive and various form to visualize data and charts: [EPA](https://www.epa.gov/ghgreporting/ghgrp-reported-data)
 
 # 2. Data Collection and Preprocessing
 
 ## a. Import
+
+Importing necessary libraries
+
+```{r}
+#| label: required-packages
+#| message: false
+
+library(tidyverse)
+library(palmerpenguins)
+library(ggbeeswarm)
+library(ggmosaic)
+library(rstatix)
+
+```
+
+Reading of **Total Annual Greenhouse Gas Emissions Dataset**
 
 ```{r}
 #| echo: false
@@ -72,18 +87,64 @@ The news article aims to convey the impacts if the current situation remains unc
 # Read the CSV file
 totalGHG <- read.csv("total_ghg_dataset.csv")
 
-# Rename the column containing GHG emissions
-colnames(totalGHG)[colnames(totalGHG) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "Total C02 Emissions (t)"
+# Convert to tibble
+totalGHG <- as_tibble(totalGHG)
 
-# View the dataset with the renamed column
-print(totalGHG, row.names = FALSE)
+# Display only the first 10 rows of the dataset
+print(totalGHG)
+
+```
+
+Reading of **Greenhouse Gas Emissions Per Capita Dataset**
+
+```{r}
+#| echo: false
+
+# Read the CSV file
+perCapitaGHG <- read.csv("per_capita_ghg_dataset.csv")
+
+# Convert to tibble
+perCapitaGHG <- as_tibble(perCapitaGHG)
+
+# Display only the first 10 rows of the dataset
+print(perCapitaGHG)
 
 ```
 
 ## b. Clean
 
+Remove NAs and renamed column from **Total Annual Greenhouse Gas Emissions Dataset**
+
 ```{r}
 #| echo: false
+
+# Rename the total emissions column
+colnames(totalGHG)[colnames(totalGHG) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "Total C02 Emissions (t)"
+
+# Display total GHG emission column as a whole number
+totalGHG$"Total C02 Emissions (t)" <- as.integer(totalGHG$"Total C02 Emissions (t)")
+
+# Remove NAs from total emissions column
+totalGHG_cleaned <- drop_na(totalGHG, "Total C02 Emissions (t)")
+
+# View the dataset
+print(totalGHG_cleaned)
+
+```
+
+Remove NAs and renamed column from **Greenhouse Gas Emissions Per Capita Dataset**
+
+```{r}
+#| echo: false
+
+# Rename the per capita emissions column
+colnames(perCapitaGHG)[colnames(perCapitaGHG) == "Total.greenhouse.gas.emissions.per.capita.excluding.land.use.change.and.forestry"] <- "Per Capita C02 Emissions (t)"
+
+# Remove NAs from per capita emissions column
+perCapitaGHG_cleaned <- drop_na(perCapitaGHG, "Per Capita C02 Emissions (t)")
+
+# View the dataset
+print(perCapitaGHG_cleaned)
 
 ```
 
