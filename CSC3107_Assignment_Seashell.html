@@ -160,8 +160,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="iii.-our-world-in-data">iii. Our World in Data</h3>
 <ol type="1">
 <li><a href="https://github.com/owid/co2-data?tafb=readme-ov-file">Github Bank</a></li>
-<li><a href="https://ourworldindata.org/grapher/total-ghg-emissions">Total GHG</a></li>
-<li><a href="https://ourworldindata.org/grapher/per-capita-ghg-excl-land-use">Per Capita GHG</a></li>
+<li><a href="https://ourworldindata.org/grapher/total-ghg-emissions?tab=table">Total GHG</a></li>
+<li><a href="https://ourworldindata.org/grapher/per-capita-ghg-emissions?tab=table">Per Capita GHG</a></li>
 </ol>
 </section>
 <section id="iv.-epa" class="level3">
@@ -174,17 +174,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="data-collection-and-preprocessing" class="level1">
 <h1>2. Data Collection and Preprocessing</h1>
-<section id="a.-import" class="level2">
-<h2 class="anchored" data-anchor-id="a.-import">a. Import</h2>
-<p>Importing necessary libraries</p>
+<section id="a.-import-packages" class="level2">
+<h2 class="anchored" data-anchor-id="a.-import-packages">a. Import packages</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggbeeswarm)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggmosaic)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstatix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggbeeswarm)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggmosaic)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstatix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Reading of <strong>Total Annual Greenhouse Gas Emissions Dataset</strong></p>
+</section>
+<section id="b.-view-data" class="level2">
+<h2 class="anchored" data-anchor-id="b.-view-data">b. View Data</h2>
+<section id="i.-reading-of-total-annual-greenhouse-gas-emissions-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="i.-reading-of-total-annual-greenhouse-gas-emissions-dataset">i. Reading of <strong>Total Annual Greenhouse Gas Emissions Dataset</strong></h3>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 37,195 × 4
@@ -203,74 +205,137 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 # ℹ 37,185 more rows</code></pre>
 </div>
 </div>
-<p>Reading of <strong>Greenhouse Gas Emissions Per Capita Dataset</strong></p>
+</section>
+<section id="ii.-reading-of-greenhouse-gas-emissions-per-capita-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-reading-of-greenhouse-gas-emissions-per-capita-dataset">ii. Reading of <strong>Greenhouse Gas Emissions Per Capita Dataset</strong></h3>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6,354 × 4
-   Entity      Code   Year Total.greenhouse.gas.emissions.per.capita.excluding…¹
+<pre><code># A tibble: 35,611 × 4
+   Entity      Code   Year Per.capita.greenhouse.gas.emissions.in.CO..equivale…¹
    &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                                                 &lt;dbl&gt;
- 1 Afghanistan AFG    1990                                                 1.09 
- 2 Afghanistan AFG    1991                                                 1.11 
- 3 Afghanistan AFG    1992                                                 0.958
- 4 Afghanistan AFG    1993                                                 0.834
- 5 Afghanistan AFG    1994                                                 0.759
- 6 Afghanistan AFG    1995                                                 0.742
- 7 Afghanistan AFG    1996                                                 0.773
- 8 Afghanistan AFG    1997                                                 0.799
- 9 Afghanistan AFG    1998                                                 0.814
-10 Afghanistan AFG    1999                                                 0.830
-# ℹ 6,344 more rows
-# ℹ abbreviated name:
-#   ¹​Total.greenhouse.gas.emissions.per.capita.excluding.land.use.change.and.forestry</code></pre>
+ 1 Afghanistan AFG    1850                                                  1.96
+ 2 Afghanistan AFG    1851                                                  1.96
+ 3 Afghanistan AFG    1852                                                  1.97
+ 4 Afghanistan AFG    1853                                                  1.98
+ 5 Afghanistan AFG    1854                                                  1.99
+ 6 Afghanistan AFG    1855                                                  1.99
+ 7 Afghanistan AFG    1856                                                  2.00
+ 8 Afghanistan AFG    1857                                                  2.00
+ 9 Afghanistan AFG    1858                                                  2.01
+10 Afghanistan AFG    1859                                                  2.01
+# ℹ 35,601 more rows
+# ℹ abbreviated name: ¹​Per.capita.greenhouse.gas.emissions.in.CO..equivalents</code></pre>
 </div>
 </div>
 </section>
-<section id="b.-clean" class="level2">
-<h2 class="anchored" data-anchor-id="b.-clean">b. Clean</h2>
-<p>Remove NAs and renamed column from <strong>Total Annual Greenhouse Gas Emissions Dataset</strong></p>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: NAs introduced by coercion to integer range</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 35,303 × 4
-   Entity      Code   Year `Total C02 Emissions (t)`
-   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                     &lt;int&gt;
- 1 Afghanistan AFG    1850                   7338819
- 2 Afghanistan AFG    1851                   7403982
- 3 Afghanistan AFG    1852                   7464157
- 4 Afghanistan AFG    1853                   7522431
- 5 Afghanistan AFG    1854                   7579209
- 6 Afghanistan AFG    1855                   7634722
- 7 Afghanistan AFG    1856                   7689125
- 8 Afghanistan AFG    1857                   7742261
- 9 Afghanistan AFG    1858                   7794177
-10 Afghanistan AFG    1859                   7844884
-# ℹ 35,293 more rows</code></pre>
-</div>
-</div>
-<p>Remove NAs and renamed column from <strong>Greenhouse Gas Emissions Per Capita Dataset</strong></p>
+</section>
+<section id="d.-clean" class="level2">
+<h2 class="anchored" data-anchor-id="d.-clean">d.&nbsp;Clean</h2>
+<section id="i.-remove-nas-and-renamed-column-from-total-annual-greenhouse-gas-emissions-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="i.-remove-nas-and-renamed-column-from-total-annual-greenhouse-gas-emissions-dataset">i. Remove NAs and renamed column from <strong>Total Annual Greenhouse Gas Emissions Dataset</strong></h3>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6,354 × 4
-   Entity      Code   Year `Per Capita C02 Emissions (t)`
-   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                          &lt;dbl&gt;
- 1 Afghanistan AFG    1990                          1.09 
- 2 Afghanistan AFG    1991                          1.11 
- 3 Afghanistan AFG    1992                          0.958
- 4 Afghanistan AFG    1993                          0.834
- 5 Afghanistan AFG    1994                          0.759
- 6 Afghanistan AFG    1995                          0.742
- 7 Afghanistan AFG    1996                          0.773
- 8 Afghanistan AFG    1997                          0.799
- 9 Afghanistan AFG    1998                          0.814
-10 Afghanistan AFG    1999                          0.830
-# ℹ 6,344 more rows</code></pre>
+<pre><code># A tibble: 37,195 × 4
+   country     code   year total_ghg_emissions_t
+   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                 &lt;dbl&gt;
+ 1 Afghanistan AFG    1850              7338819 
+ 2 Afghanistan AFG    1851              7403982.
+ 3 Afghanistan AFG    1852              7464157 
+ 4 Afghanistan AFG    1853              7522432.
+ 5 Afghanistan AFG    1854              7579210.
+ 6 Afghanistan AFG    1855              7634722 
+ 7 Afghanistan AFG    1856              7689125 
+ 8 Afghanistan AFG    1857              7742261 
+ 9 Afghanistan AFG    1858              7794177 
+10 Afghanistan AFG    1859              7844884.
+# ℹ 37,185 more rows</code></pre>
 </div>
 </div>
+</section>
+<section id="ii.-remove-nas-and-renamed-column-from-greenhouse-gas-emissions-per-capita-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-remove-nas-and-renamed-column-from-greenhouse-gas-emissions-per-capita-dataset">ii. Remove NAs and renamed column from <strong>Greenhouse Gas Emissions Per Capita Dataset</strong></h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 35,611 × 4
+   country     code   year per_capita_ghg_emissions_t
+   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                      &lt;dbl&gt;
+ 1 Afghanistan AFG    1850                       1.96
+ 2 Afghanistan AFG    1851                       1.96
+ 3 Afghanistan AFG    1852                       1.97
+ 4 Afghanistan AFG    1853                       1.98
+ 5 Afghanistan AFG    1854                       1.99
+ 6 Afghanistan AFG    1855                       1.99
+ 7 Afghanistan AFG    1856                       2.00
+ 8 Afghanistan AFG    1857                       2.00
+ 9 Afghanistan AFG    1858                       2.01
+10 Afghanistan AFG    1859                       2.01
+# ℹ 35,601 more rows</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="c.-process" class="level2">
 <h2 class="anchored" data-anchor-id="c.-process">c.&nbsp;Process</h2>
+<section id="i.-filter-emissions-happening-in-2022-from-total-annual-greenhouse-gas-emissions-dataset-and-greenhouse-gas-emissions-per-capita-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="i.-filter-emissions-happening-in-2022-from-total-annual-greenhouse-gas-emissions-dataset-and-greenhouse-gas-emissions-per-capita-dataset">i. Filter emissions happening in 2022 from <strong>Total Annual Greenhouse Gas Emissions Dataset</strong> and <strong>Greenhouse Gas Emissions Per Capita Dataset</strong></h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 215 × 4
+   country             code   year total_ghg_emissions_t
+   &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;                 &lt;dbl&gt;
+ 1 Afghanistan         "AFG"  2022             36614290 
+ 2 Africa              ""     2022           4747870000 
+ 3 Albania             "ALB"  2022              8034590.
+ 4 Algeria             "DZA"  2022            281968320 
+ 5 Andorra             "AND"  2022               482079.
+ 6 Angola              "AGO"  2022            182069890 
+ 7 Antigua and Barbuda "ATG"  2022               683093.
+ 8 Argentina           "ARG"  2022            388107140 
+ 9 Armenia             "ARM"  2022              9655818 
+10 Asia                ""     2022          30062864000 
+# ℹ 205 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 208 × 4
+   country             code   year per_capita_ghg_emissions_t
+   &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;                      &lt;dbl&gt;
+ 1 Afghanistan         "AFG"  2022                      0.890
+ 2 Africa              ""     2022                      3.33 
+ 3 Albania             "ALB"  2022                      2.83 
+ 4 Algeria             "DZA"  2022                      6.28 
+ 5 Andorra             "AND"  2022                      6.04 
+ 6 Angola              "AGO"  2022                      5.12 
+ 7 Antigua and Barbuda "ATG"  2022                      7.28 
+ 8 Argentina           "ARG"  2022                      8.53 
+ 9 Armenia             "ARM"  2022                      3.47 
+10 Asia                ""     2022                      6.37 
+# ℹ 198 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="ii.-merge-the-two-datasets-based-on-the-country-name" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-merge-the-two-datasets-based-on-the-country-name">ii. Merge the two datasets based on the country name</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 208 × 3
+   country             total_ghg_emissions_t per_capita_ghg_emissions_t
+   &lt;chr&gt;                               &lt;dbl&gt;                      &lt;dbl&gt;
+ 1 Afghanistan                     36614290                       0.890
+ 2 Africa                        4747870000                       3.33 
+ 3 Albania                          8034590.                      2.83 
+ 4 Algeria                        281968320                       6.28 
+ 5 Andorra                           482079.                      6.04 
+ 6 Angola                         182069890                       5.12 
+ 7 Antigua and Barbuda               683093.                      7.28 
+ 8 Argentina                      388107140                       8.53 
+ 9 Armenia                          9655818                       3.47 
+10 Asia                         30062864000                       6.37 
+# ℹ 198 more rows</code></pre>
+</div>
+</div>
+</section>
 </section>
 </section>
 <section id="visualization" class="level1">

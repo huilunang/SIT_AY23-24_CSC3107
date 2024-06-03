@@ -2,6 +2,8 @@
 title: "CSC3107_Assignment_Seashell"
 format: html
 editor: visual
+execute:
+  echo: false
 ---
 
 # 1. Introduction
@@ -54,8 +56,8 @@ The news article aims to convey the impacts if the current situation remains unc
 ### iii. Our World in Data
 
 1.  [Github Bank](https://github.com/owid/co2-data?tafb=readme-ov-file)
-2.  [Total GHG](https://ourworldindata.org/grapher/total-ghg-emissions)
-3.  [Per Capita GHG](https://ourworldindata.org/grapher/per-capita-ghg-excl-land-use)
+2.  [Total GHG](https://ourworldindata.org/grapher/total-ghg-emissions?tab=table)
+3.  [Per Capita GHG](https://ourworldindata.org/grapher/per-capita-ghg-emissions?tab=table)
 
 ### iv. EPA
 
@@ -63,26 +65,25 @@ The news article aims to convey the impacts if the current situation remains unc
 
 # 2. Data Collection and Preprocessing
 
-## a. Import
-
-Importing necessary libraries
+## a. Import packages
 
 ```{r}
 #| label: required-packages
+#| echo: true
 #| message: false
+#| warning: false
 
 library(tidyverse)
-library(palmerpenguins)
 library(ggbeeswarm)
 library(ggmosaic)
 library(rstatix)
-
 ```
 
-Reading of **Total Annual Greenhouse Gas Emissions Dataset**
+## b. View Data
+### i. Reading of **Total Annual Greenhouse Gas Emissions Dataset**
 
 ```{r}
-#| echo: false
+#| label: import-dataset
 
 # Read the CSV file
 totalGHG <- read.csv("total_ghg_dataset.csv")
@@ -90,65 +91,78 @@ totalGHG <- read.csv("total_ghg_dataset.csv")
 # Convert to tibble
 totalGHG <- as_tibble(totalGHG)
 
-# Display only the first 10 rows of the dataset
 print(totalGHG)
-
 ```
 
-Reading of **Greenhouse Gas Emissions Per Capita Dataset**
+### ii. Reading of **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
-#| echo: false
-
 # Read the CSV file
 perCapitaGHG <- read.csv("per_capita_ghg_dataset.csv")
 
 # Convert to tibble
 perCapitaGHG <- as_tibble(perCapitaGHG)
 
-# Display only the first 10 rows of the dataset
 print(perCapitaGHG)
-
 ```
 
-## b. Clean
-
-Remove NAs and renamed column from **Total Annual Greenhouse Gas Emissions Dataset**
+## d. Clean
+### i. Remove NAs and renamed column from **Total Annual Greenhouse Gas Emissions Dataset**
 
 ```{r}
-#| echo: false
-
-# Rename the total emissions column
-colnames(totalGHG)[colnames(totalGHG) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "Total C02 Emissions (t)"
+# Rename column
+colnames(totalGHG)[colnames(totalGHG) == "Entity"] <- "country"
+colnames(totalGHG)[colnames(totalGHG) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "total_ghg_emissions_t"
+colnames(totalGHG) <- tolower(colnames(totalGHG))
 
 # Display total GHG emission column as a whole number
-totalGHG$"Total C02 Emissions (t)" <- as.integer(totalGHG$"Total C02 Emissions (t)")
+# totalGHG$total_ghg_emissions_t <- as.double(totalGHG$total_ghg_emissions_t)
 
 # Remove NAs from total emissions column
-totalGHG_cleaned <- drop_na(totalGHG, "Total C02 Emissions (t)")
+totalGHG_cleaned <- drop_na(totalGHG, total_ghg_emissions_t)
 
-# View the dataset
 print(totalGHG_cleaned)
-
 ```
 
-Remove NAs and renamed column from **Greenhouse Gas Emissions Per Capita Dataset**
+### ii. Remove NAs and renamed column from **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
-#| echo: false
-
 # Rename the per capita emissions column
-colnames(perCapitaGHG)[colnames(perCapitaGHG) == "Total.greenhouse.gas.emissions.per.capita.excluding.land.use.change.and.forestry"] <- "Per Capita C02 Emissions (t)"
+colnames(perCapitaGHG)[colnames(perCapitaGHG) == "Entity"] <- "country"
+colnames(perCapitaGHG)[colnames(perCapitaGHG) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "per_capita_ghg_emissions_t"
+colnames(perCapitaGHG) <- tolower(colnames(perCapitaGHG))
+
+# Display total GHG emission column as a whole number
+# perCapitaGHG$per_capita_ghg_emissions_t <- as.double(perCapitaGHG$per_capita_ghg_emissions_t)
 
 # Remove NAs from per capita emissions column
-perCapitaGHG_cleaned <- drop_na(perCapitaGHG, "Per Capita C02 Emissions (t)")
+perCapitaGHG_cleaned <- drop_na(perCapitaGHG, per_capita_ghg_emissions_t)
 
-# View the dataset
 print(perCapitaGHG_cleaned)
-
 ```
 
 ## c. Process
+### i. Filter emissions happening in 2022 from **Total Annual Greenhouse Gas Emissions Dataset** and **Greenhouse Gas Emissions Per Capita Dataset**
+```{r}
+totalGHG_cleaned_2022 <- filter(totalGHG_cleaned, year == 2022)
+
+print(totalGHG_cleaned_2022)
+```
+
+```{r}
+perCapitaGHG_cleaned_2022 <- filter(perCapitaGHG_cleaned, year == 2022)
+
+print(perCapitaGHG_cleaned_2022)
+```
+
+### ii. Merge the two datasets based on the country name
+```{r}
+ghg_2022 <- inner_join(totalGHG_cleaned_2022, perCapitaGHG_cleaned_2022, by = "country")
+
+ghg_2022 <- ghg_2022 %>% select(country, total_ghg_emissions_t, per_capita_ghg_emissions_t)
+
+print(ghg_2022)
+```
 
 # 3. Visualization
 
