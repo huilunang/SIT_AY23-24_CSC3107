@@ -73,6 +73,10 @@ The news article aims to convey the impacts if the current situation remains unc
 #| message: false
 #| warning: false
 
+library(htmltools)
+library(leaflet)
+library(rnaturalearth)
+library(sf)
 library(tidyverse)
 library(ggbeeswarm)
 library(ggmosaic)
@@ -86,24 +90,24 @@ library(rstatix)
 #| label: import-dataset
 
 # Read the CSV file
-totalGHG <- read.csv("total_ghg_dataset.csv")
+total_ghg <- read.csv("total_ghg_dataset.csv")
 
 # Convert to tibble
-totalGHG <- as_tibble(totalGHG)
+total_ghg <- as_tibble(total_ghg)
 
-print(totalGHG)
+print(total_ghg)
 ```
 
 ### ii. Reading of **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
 # Read the CSV file
-perCapitaGHG <- read.csv("per_capita_ghg_dataset.csv")
+per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
 
 # Convert to tibble
-perCapitaGHG <- as_tibble(perCapitaGHG)
+per_capita_ghg <- as_tibble(per_capita_ghg)
 
-print(perCapitaGHG)
+print(per_capita_ghg)
 ```
 
 ## d. Clean
@@ -111,53 +115,53 @@ print(perCapitaGHG)
 
 ```{r}
 # Rename column
-colnames(totalGHG)[colnames(totalGHG) == "Entity"] <- "country"
-colnames(totalGHG)[colnames(totalGHG) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "total_ghg_emissions_t"
-colnames(totalGHG) <- tolower(colnames(totalGHG))
+colnames(total_ghg)[colnames(total_ghg) == "Entity"] <- "country"
+colnames(total_ghg)[colnames(total_ghg) == "Annual.greenhouse.gas.emissions.in.CO..equivalents"] <- "total_ghg_emissions_t"
+colnames(total_ghg) <- tolower(colnames(total_ghg))
 
 # Display total GHG emission column as a whole number
-# totalGHG$total_ghg_emissions_t <- as.double(totalGHG$total_ghg_emissions_t)
+# total_ghg$total_ghg_emissions_t <- as.double(total_ghg$total_ghg_emissions_t)
 
 # Remove NAs from total emissions column
-totalGHG_cleaned <- drop_na(totalGHG, total_ghg_emissions_t)
+total_ghg_cleaned <- drop_na(total_ghg, total_ghg_emissions_t)
 
-print(totalGHG_cleaned)
+print(total_ghg_cleaned)
 ```
 
 ### ii. Remove NAs and renamed column from **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
 # Rename the per capita emissions column
-colnames(perCapitaGHG)[colnames(perCapitaGHG) == "Entity"] <- "country"
-colnames(perCapitaGHG)[colnames(perCapitaGHG) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "per_capita_ghg_emissions_t"
-colnames(perCapitaGHG) <- tolower(colnames(perCapitaGHG))
+colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Entity"] <- "country"
+colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "per_capita_ghg_emissions_t"
+colnames(per_capita_ghg) <- tolower(colnames(per_capita_ghg))
 
 # Display total GHG emission column as a whole number
-# perCapitaGHG$per_capita_ghg_emissions_t <- as.double(perCapitaGHG$per_capita_ghg_emissions_t)
+# per_capita_ghg$per_capita_ghg_emissions_t <- as.double(per_capita_ghg$per_capita_ghg_emissions_t)
 
 # Remove NAs from per capita emissions column
-perCapitaGHG_cleaned <- drop_na(perCapitaGHG, per_capita_ghg_emissions_t)
+per_capita_ghg_cleaned <- drop_na(per_capita_ghg, per_capita_ghg_emissions_t)
 
-print(perCapitaGHG_cleaned)
+print(per_capita_ghg_cleaned)
 ```
 
-## c. Process
+## e. Process
 ### i. Filter emissions happening in 2022 from **Total Annual Greenhouse Gas Emissions Dataset** and **Greenhouse Gas Emissions Per Capita Dataset**
 ```{r}
-totalGHG_cleaned_2022 <- filter(totalGHG_cleaned, year == 2022)
+total_ghg_cleaned_2022 <- filter(total_ghg_cleaned, year == 2022)
 
-print(totalGHG_cleaned_2022)
+print(total_ghg_cleaned_2022)
 ```
 
 ```{r}
-perCapitaGHG_cleaned_2022 <- filter(perCapitaGHG_cleaned, year == 2022)
+per_capita_ghg_cleaned_2022 <- filter(per_capita_ghg_cleaned, year == 2022)
 
-print(perCapitaGHG_cleaned_2022)
+print(per_capita_ghg_cleaned_2022)
 ```
 
 ### ii. Merge the two datasets based on the country name
 ```{r}
-ghg_2022 <- inner_join(totalGHG_cleaned_2022, perCapitaGHG_cleaned_2022, by = "country")
+ghg_2022 <- inner_join(total_ghg_cleaned_2022, per_capita_ghg_cleaned_2022, by = "country")
 
 ghg_2022 <- ghg_2022 %>% select(country, total_ghg_emissions_t, per_capita_ghg_emissions_t)
 
@@ -165,10 +169,95 @@ print(ghg_2022)
 ```
 
 # 3. Visualization
-
 ## a. World Emission Chart using World Map
+### i. Improvement of bubble chart - Interactive
+```{r}
+# Get world map data
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+# Merge emissions data with world map
+world <- left_join(world, ghg_2022, by = c("name" = "country"))
+
+# Sort world data by total GHG emissions
+world <- world %>%
+  arrange(desc(total_ghg_emissions_t)) %>%
+  mutate(ranking = row_number())
+
+# Create color palette
+pal <- colorNumeric(palette = "YlOrRd", domain = world$total_ghg_emissions_t)
+
+# Add ranking and labels
+world$label <- lapply(
+  sprintf(
+    "<strong>%d. %s</strong><br/>%s t",
+    world$ranking, world$name, prettyNum(world$total_ghg_emissions_t, big.mark = ",")
+  ), HTML
+)
+
+# Get top 10 contributors and other countries
+top_contributors <- filter(world, ranking <= 10)
+other_countries <- filter(world, ranking > 10)
+```
 
 ```{r}
-#| echo: false
+polys <- function(map, data, hide) {
+  map %>%
+    addPolygons(
+      data = data,
+      fillColor = ~ pal(total_ghg_emissions_t),
+      weight = 1,
+      opacity = 1,
+      color = "black",
+      dashArray = "2",
+      fillOpacity = 0.7,
+      highlightOptions = highlightOptions(
+        weight = 3,
+        color = "black",
+        dashArray = "",
+        fillOpacity = 0.7,
+        bringToFront = TRUE
+      ),
+      label = ~label,
+      labelOptions = labelOptions(
+        style = list(
+          "font-weight" = "normal",
+          "box-shadow" = "3px 3px rgba(0, 0, 0, 0.25)",
+          padding = "5px 8px"
+        ),
+        textsize = "10px",
+        direction = "auto",
+        noHide = hide
+      )
+    )
+}
 
+# Create leaflet map with specific initial view
+map <- leaflet() %>%
+  addTiles() %>%
+  polys(other_countries, FALSE) %>%
+  polys(top_contributors, TRUE) %>%
+  addLegend(
+    pal = pal,
+    values = world$total_ghg_emissions_t,
+    opacity = 0.7,
+    title = "<span style='font-size: 12px;'>Tonnes (t) of CO<sub>2</sub> equivalent</span>",
+    position = "bottomright"
+  ) %>%
+  setView(lng = 84.1240, lat = 28.3949, zoom = 3)
+
+# Add title and footnote
+map %>%
+  addControl(
+    html = paste(
+      "<div style='padding: 18px 10px;'>",
+      "<span style='font-size: 20px;'><b>Total greenhouse gas emissions in 2022</b></span>",
+      "</div>",
+      sep = ""
+    ),
+    position = "topright"
+  ) %>%
+  addControl(
+    html = "<footnote>Source: Our World in Data</footnote>",
+    position = "bottomleft"
+  )
 ```
