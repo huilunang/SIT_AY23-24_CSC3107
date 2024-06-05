@@ -52,6 +52,7 @@ The news article aims to convey the impacts if the current situation remains unc
 ### ii. Climate Action Tracker
 
 1.  Able to filter by sector and various indicators, this video explains on the different tool provided. Limited data of Southeast Asia countries, can look into changing focus to worldwide contributors: [Climate Action Tracker](https://climateactiontracker.org/cat-data-explorer/sector-indicators/?sector=Transport%20Road&indicator=EV%20stock%20shares&country=SGP&country=IDN&country=PHL&scenario=benchmark&scenario=projected_current_policy&mode=countries)
+2. [GHG Emission Analysis](https://climateactiontracker.org/cat-data-explorer/country-emissions/)
 
 ### iii. Our World in Data
 
@@ -87,7 +88,7 @@ library(rstatix)
 ### i. Reading of **Total Annual Greenhouse Gas Emissions Dataset**
 
 ```{r}
-#| label: import-dataset
+#| label: dataset-part-e-iii-2
 
 # Read the CSV file
 total_ghg <- read.csv("total_ghg_dataset.csv")
@@ -101,6 +102,8 @@ print(total_ghg)
 ### ii. Reading of **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
+#| label: dataset-part-e-iii-3
+#| 
 # Read the CSV file
 per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
 
@@ -110,7 +113,18 @@ per_capita_ghg <- as_tibble(per_capita_ghg)
 print(per_capita_ghg)
 ```
 
-## d. Clean
+### iii. Reading of **Greenhouse Gas Emission Analysis Dataset**
+```{r}
+#| label: dataset-part-e-ii-2
+
+analysis_ghg <- read.csv("ghg_emission_analysis_dataset.csv")
+
+analysis_ghg <- as_tibble(analysis_ghg)
+
+print(analysis_ghg)
+```
+
+## c. Clean
 ### i. Remove NAs and renamed column from **Total Annual Greenhouse Gas Emissions Dataset**
 
 ```{r}
@@ -145,7 +159,7 @@ per_capita_ghg_cleaned <- drop_na(per_capita_ghg, per_capita_ghg_emissions_t)
 print(per_capita_ghg_cleaned)
 ```
 
-## e. Process
+## d. Process
 ### i. Filter emissions happening in 2022 from **Total Annual Greenhouse Gas Emissions Dataset** and **Greenhouse Gas Emissions Per Capita Dataset**
 ```{r}
 total_ghg_cleaned_2022 <- filter(total_ghg_cleaned, year == 2022)
@@ -159,18 +173,45 @@ per_capita_ghg_cleaned_2022 <- filter(per_capita_ghg_cleaned, year == 2022)
 print(per_capita_ghg_cleaned_2022)
 ```
 
-### ii. Merge the two datasets based on the country name
+### ii. Filter projected reduction emission by 2030 to keep global temperature rise below 1.5°C from **Greenhouse Gas Emission Analysis Dataset**
+```{r}
+analysis_ghg_projected_2030 <- filter(analysis_ghg, grepl("1.5", scenario), indicator == "Equity boundaries (absolute)", year == 2030)
+
+analysis_ghg_projected_2030 <- analysis_ghg_projected_2030 %>%
+  select(region, value) %>%
+  mutate(value = value * 1000000) %>%
+  rename(projected_ghg_emissions_t = value)
+
+print(analysis_ghg_projected_2030)
+```
+
+### iii. Merge the **Total Annual GHG** and **Per Capita GHG** datasets based on the country name
 ```{r}
 ghg_2022 <- inner_join(total_ghg_cleaned_2022, per_capita_ghg_cleaned_2022, by = "country")
 
-ghg_2022 <- ghg_2022 %>% select(country, total_ghg_emissions_t, per_capita_ghg_emissions_t)
+ghg_2022 <- ghg_2022 %>%
+  select(country, "code.x", total_ghg_emissions_t, per_capita_ghg_emissions_t) %>%
+  rename(code = "code.x")
 
 print(ghg_2022)
 ```
 
+### iv. Merge the **GHG 2022** and **Projected GHG 2030** datasets based on the country code
+```{r}
+ghg_2022_projected_2030 <- left_join(ghg_2022, analysis_ghg_projected_2030, by = c("code" = "region"))
+
+print(ghg_2022_projected_2030)
+```
+
 # 3. Visualization
 ## a. World Emission Chart using World Map
-### i. Improvement of bubble chart - Interactive
+#### Previous Chart
+- Bubble chart by size to show the ranking of the countries
+
+#### Improved Elements
+- Used world map to show the data
+- Used label to show the ranking of the countries
+- Used color palette to show the intensity of the data
 ```{r}
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
