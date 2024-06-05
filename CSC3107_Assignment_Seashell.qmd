@@ -199,6 +199,10 @@ print(ghg_2022)
 ### iv. Merge the **GHG 2022** and **Projected GHG 2030** datasets based on the country code
 ```{r}
 ghg_2022_projected_2030 <- left_join(ghg_2022, analysis_ghg_projected_2030, by = c("code" = "region"))
+ghg_2022_projected_2030 <- mutate(ghg_2022_projected_2030, country = case_when(
+    country == "United States" ~ "United States of America",
+    TRUE ~ country
+  ))
 
 print(ghg_2022_projected_2030)
 ```
@@ -207,17 +211,20 @@ print(ghg_2022_projected_2030)
 ## a. World Emission Chart using World Map
 #### Previous Chart
 - Bubble chart by size to show the ranking of the countries
+![Original Total Greenhouse Gas Emissions](total_ghg_emissions_bbchart.png)
 
 #### Improved Elements
 - Used world map to show the data
 - Used label to show the ranking of the countries
 - Used color palette to show the intensity of the data
+
+> **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
 ```{r}
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
 # Merge emissions data with world map
-world <- left_join(world, ghg_2022, by = c("name" = "country"))
+world <- left_join(world, ghg_2022_projected_2030, by = c("name" = "country"))
 
 # Sort world data by total GHG emissions
 world <- world %>%
