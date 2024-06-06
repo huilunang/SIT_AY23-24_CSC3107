@@ -79,9 +79,7 @@ library(leaflet)
 library(rnaturalearth)
 library(sf)
 library(tidyverse)
-library(ggbeeswarm)
-library(ggmosaic)
-library(rstatix)
+library(ggtext)
 ```
 
 ## b. View Data
@@ -163,12 +161,14 @@ print(per_capita_ghg_cleaned)
 ### i. Filter emissions happening in 2022 from **Total Annual Greenhouse Gas Emissions Dataset** and **Greenhouse Gas Emissions Per Capita Dataset**
 ```{r}
 total_ghg_cleaned_2022 <- filter(total_ghg_cleaned, year == 2022)
+total_ghg_cleaned_2022 <- mutate(total_ghg_cleaned_2022, code = if_else(country == "European Union (27)", "EU27", code))
 
 print(total_ghg_cleaned_2022)
 ```
 
 ```{r}
 per_capita_ghg_cleaned_2022 <- filter(per_capita_ghg_cleaned, year == 2022)
+per_capita_ghg_cleaned_2022 <- mutate(per_capita_ghg_cleaned_2022, code = if_else(country == "European Union (27)", "EU27", code))
 
 print(per_capita_ghg_cleaned_2022)
 ```
@@ -219,6 +219,7 @@ print(ghg_2022_projected_2030)
 - Used color palette to show the intensity of the data
 
 > **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
+
 ```{r}
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
@@ -308,4 +309,74 @@ map %>%
     html = "<footnote>Source: Our World in Data</footnote>",
     position = "bottomleft"
   )
+```
+
+## b. Reduction Emission Chart using Extended Dumbbell Chart
+#### Previous Chart
+- Horizontal bar chart to show the reduction of emission by 2030
+- Single color palette caused misleading information (e.g., Nigeria should contribute more to the greenhouse gases emission)
+![Original Total Emissions Reduction Required](percentage_reduction_required_1_5.png)
+
+#### Improved Elements
+- Used dumbbell chart to show the reduction of emission by 2030
+- Used distinct color to show the current and projected emission
+- Show the percentage reduction of the emission
+- Focus on the top 10 contributors that should reduce emission
+
+```{r}
+#| warning: false
+
+# eu27_code <- c("AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE") #world-adm0_a3
+
+# Calculate percentage reduction
+top_contributors <- top_contributors %>%
+  mutate(percentage_reduction = ((projected_ghg_emissions_t - total_ghg_emissions_t) / total_ghg_emissions_t) * 100)
+
+# Pivot data to longer format
+top_contributors_e <- top_contributors %>%
+  pivot_longer(
+    cols = c(total_ghg_emissions_t, projected_ghg_emissions_t),
+    names_to = "emission_type",
+    values_to = "ghg_emissions_t"
+  ) %>%
+  mutate(emission_type = if_else(emission_type == "total_ghg_emissions_t", "Current", "Projected"))
+
+# Select relevant columns
+top_contributors_e <- top_contributors_e %>%
+  select(per_capita_ghg_emissions_t, ranking, emission_type, percentage_reduction, ghg_emissions_t, name)
+
+# Plot
+p <- ggplot(top_contributors_e) +
+  geom_vline(xintercept = 0, linetype = "solid", linewidth = .5, alpha = .8, color = "#762a83") +
+  geom_segment(
+    data = top_contributors,
+    aes(x = projected_ghg_emissions_t, xend = total_ghg_emissions_t, y = name, yend = name),
+    color = "#F1DEDE", linewidth = 4
+  ) +
+  annotate("text", x = 10^8.15, y = 10, label = "(% Reduction)", size = 3, vjust = -1.5) +
+  geom_point(aes(x = ghg_emissions_t, y = name, color = emission_type), size = 4) +
+  scale_color_manual(values = c("#DF6873", "#00B8A5"), name = "Emission Type") +
+  geom_text(
+    data = filter(top_contributors_e, emission_type == "Current"),
+    aes(x = 1e8, y = name, label = paste("(", round(percentage_reduction, 2), ")")),
+    hjust = 0, vjust = 0.5, size = 3, color = "black"
+  ) +
+  ggtitle("Required Emission Cuts for 1.5°C") +
+  labs(
+    x = "GHG Emissions (tonnes)",
+    y = "Country",
+    subtitle = "<span style = 'color: #DF6873;'>Current</span> and <span style = 'color: #00B8A5;'>Projected</span> from 2022 to 2030<br>"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_markdown(),
+    axis.title.x = element_text(margin = margin(t = 20))
+  ) +
+  scale_x_log10(
+    breaks = scales::trans_breaks("log10", function(x) 10^x, n = 5),
+    labels = scales::trans_format("log10", scales::math_format(10^.x))
+  )
+
+p
 ```
