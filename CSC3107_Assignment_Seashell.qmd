@@ -380,3 +380,12 @@ p <- ggplot(top_contributors_e) +
 
 p
 ```
+
+## c. Total GHG Emissions by Country Using ____
+#### Previous Chart
+- Stacked Area Chart to show the top pollutors in the world
+![Original Top Pollutors](total_ghg_emission_stackac.png)
+
+#### Improved Elements
+
+
