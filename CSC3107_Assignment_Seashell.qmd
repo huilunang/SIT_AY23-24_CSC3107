@@ -229,17 +229,17 @@ world <- left_join(world, ghg_2022_projected_2030, by = c("name" = "country"))
 
 # Sort world data by total GHG emissions
 world <- world %>%
-  arrange(desc(total_ghg_emissions_t)) %>%
+  arrange(desc(per_capita_ghg_emissions_t)) %>%
   mutate(ranking = row_number())
 
 # Create color palette
-pal <- colorNumeric(palette = "YlOrRd", domain = world$total_ghg_emissions_t)
+pal <- colorNumeric(palette = "YlOrRd", domain = world$per_capita_ghg_emissions_t)
 
 # Add ranking and labels
 world$label <- lapply(
   sprintf(
     "<strong>%d. %s</strong><br/>%s t",
-    world$ranking, world$iso_a3_eh, prettyNum(world$total_ghg_emissions_t, big.mark = ",")
+    world$ranking, world$iso_a3_eh, prettyNum(world$per_capita_ghg_emissions_t, big.mark = ",")
   ), HTML
 )
 
@@ -253,7 +253,7 @@ polys <- function(map, data, hide) {
   map %>%
     addPolygons(
       data = data,
-      fillColor = ~ pal(total_ghg_emissions_t),
+      fillColor = ~ pal(per_capita_ghg_emissions_t),
       weight = 1,
       opacity = 1,
       color = "black",
@@ -287,19 +287,19 @@ map <- leaflet() %>%
   polys(top_contributors, TRUE) %>%
   addLegend(
     pal = pal,
-    values = world$total_ghg_emissions_t,
+    values = world$per_capita_ghg_emissions_t,
     opacity = 0.7,
     title = "<span style='font-size: 12px;'>Tonnes (t) of CO<sub>2</sub> equivalent</span>",
     position = "bottomright"
   ) %>%
-  setView(lng = 84.1240, lat = 28.3949, zoom = 3)
+  setView(lng = 84.1240, lat = 28.3949, zoom = 2)
 
 # Add title and footnote
 map %>%
   addControl(
     html = paste(
       "<div style='padding: 18px 10px;'>",
-      "<span style='font-size: 20px;'><b>Total Greenhouse Gas Emissions in 2022</b></span>",
+      "<span style='font-size: 15px;'><b>Per Capita Greenhouse Gas Emissions in 2022</b></span>",
       "</div>",
       sep = ""
     ),
