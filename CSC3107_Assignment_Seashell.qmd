@@ -299,7 +299,7 @@ map %>%
   addControl(
     html = paste(
       "<div style='padding: 18px 10px;'>",
-      "<span style='font-size: 20px;'><b>Total greenhouse gas emissions in 2022</b></span>",
+      "<span style='font-size: 20px;'><b>Total Greenhouse Gas Emissions in 2022</b></span>",
       "</div>",
       sep = ""
     ),
@@ -361,7 +361,7 @@ p <- ggplot(top_contributors_e) +
     aes(x = 1e8, y = name, label = paste("(", round(percentage_reduction, 2), ")")),
     hjust = 0, vjust = 0.5, size = 3, color = "black"
   ) +
-  ggtitle("Required Emission Cuts for 1.5°C") +
+  ggtitle("Total Greenhouse Gas Required Emission Cuts for 1.5°C") +
   labs(
     x = "GHG Emissions (tonnes)",
     y = "Country",
@@ -369,7 +369,7 @@ p <- ggplot(top_contributors_e) +
   ) +
   theme_minimal() +
   theme(
-    plot.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 13, face = "bold"),
     plot.subtitle = element_markdown(),
     axis.title.x = element_text(margin = margin(t = 20))
   ) +
