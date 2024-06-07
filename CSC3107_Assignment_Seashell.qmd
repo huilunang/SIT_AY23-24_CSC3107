@@ -211,7 +211,7 @@ print(ghg_2022_projected_2030)
 ## a. World Emission Chart using World Map
 #### Previous Chart
 - Bubble chart by size to show the ranking of the countries
-![Original Total Greenhouse Gas Emissions](total_ghg_emissions_bbchart.png)
+![Original Total Greenhouse Gas Emissions](original_chart/total_ghg_emissions_bbchart.png)
 
 #### Improved Elements
 - Used world map to show the data
@@ -315,7 +315,7 @@ map %>%
 #### Previous Chart
 - Horizontal bar chart to show the reduction of emission by 2030
 - Single color palette caused misleading information (e.g., Nigeria should contribute more to the greenhouse gases emission)
-![Original Total Emissions Reduction Required](percentage_reduction_required_1_5.png)
+![Original Total Emissions Reduction Required](original_chart/percentage_reduction_required_1_5.png)
 
 #### Improved Elements
 - Used dumbbell chart to show the reduction of emission by 2030
@@ -380,12 +380,3 @@ p <- ggplot(top_contributors_e) +
 
 p
 ```
-
-## c. Total GHG Emissions by Country Using ____
-#### Previous Chart
-- Stacked Area Chart to show the top pollutors in the world
-![Original Top Pollutors](total_ghg_emission_stackac.png)
-
-#### Improved Elements
-
-
