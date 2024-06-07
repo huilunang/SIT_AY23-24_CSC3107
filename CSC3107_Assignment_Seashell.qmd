@@ -239,7 +239,7 @@ pal <- colorNumeric(palette = "YlOrRd", domain = world$total_ghg_emissions_t)
 world$label <- lapply(
   sprintf(
     "<strong>%d. %s</strong><br/>%s t",
-    world$ranking, world$name, prettyNum(world$total_ghg_emissions_t, big.mark = ",")
+    world$ranking, world$iso_a3_eh, prettyNum(world$total_ghg_emissions_t, big.mark = ",")
   ), HTML
 )
 
@@ -358,7 +358,7 @@ p <- ggplot(top_contributors_e) +
   scale_color_manual(values = c("#DF6873", "#00B8A5"), name = "Emission Type") +
   geom_text(
     data = filter(top_contributors_e, emission_type == "Current"),
-    aes(x = 1e8, y = name, label = paste("(", round(percentage_reduction, 2), ")")),
+    aes(x = 1e8, y = name, label = paste("(", round(percentage_reduction), ")")),
     hjust = 0, vjust = 0.5, size = 3, color = "black"
   ) +
   ggtitle("Total Greenhouse Gas Required Emission Cuts for 1.5°C") +
