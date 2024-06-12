@@ -241,26 +241,26 @@ world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 world <- left_join(world, ghg_2022_projected_2030, by = c("name" = "country"))
 
 # Sort world data by per capita emissions
-world <- world %>%
+world_pc <- world %>%
   arrange(desc(per_capita_ghg_emissions_t)) %>%
   mutate(ranking = row_number())
 
 # Create color palette
-pal <- colorNumeric(palette = "YlOrRd", domain = world$per_capita_ghg_emissions_t)
+pal <- colorNumeric(palette = "YlOrRd", domain = world_pc$per_capita_ghg_emissions_t)
 
 # Add ranking and labels
-world$label <- lapply(
+world_pc$label <- lapply(
   sprintf(
     "<strong>%d. %s</strong><br/>%.2f t",
-    world$ranking, 
-    world$iso_a3_eh, 
-    world$per_capita_ghg_emissions_t
+    world_pc$ranking, 
+    world_pc$iso_a3_eh, 
+    world_pc$per_capita_ghg_emissions_t
   ), 
   HTML
 )
 
 # Create simplified dataframe
-world_simplified <- world %>%
+world_simplified <- world_pc %>%
   select(
     ranking, 
     name,
@@ -439,11 +439,14 @@ map %>%
 -   Used distinct color to show the current and projected emission
 -   Show the percentage reduction of the emission
 -   Focus on the top 10 contributors that should reduce emission
-
 ```{r}
-#| warning: false
-
 # eu27_code <- c("AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE") #world-adm0_a3
+
+world_ttl <- world %>%
+  arrange(desc(total_ghg_emissions_t)) %>%
+  mutate(ranking = row_number())
+
+top_contributors <- filter(world_ttl, ranking <= 10)
 
 # Calculate percentage reduction
 top_contributors <- top_contributors %>%
@@ -458,11 +461,13 @@ top_contributors_e <- top_contributors %>%
   ) %>%
   mutate(emission_type = if_else(emission_type == "total_ghg_emissions_t", "Current", "Projected"))
 
-top_contributors_e
-
 # Select relevant columns
 top_contributors_e <- top_contributors_e %>%
   select(per_capita_ghg_emissions_t, ranking, emission_type, percentage_reduction, ghg_emissions_t, name)
+```
+
+```{r}
+#| warning: false
 
 # Plot
 p <- ggplot(top_contributors_e) +
