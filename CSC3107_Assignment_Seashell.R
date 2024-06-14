@@ -1,78 +1,4 @@
----
-title: "CSC3107_Assignment_Seashell"
-format: html
-editor: visual
-execute:
-  echo: false
----
-
-# 1. Introduction
-
-## a. Background
-
-The chosen visualization to critique is on the world's contribution to climate impact. The target news article is [here](https://edition.cnn.com/interactive/2023/12/us/countries-climate-change-emissions-cop28/).
-
-The news article aims to convey the impacts if the current situation remains unchanged and the amount effort needed to be put in by specific countries to help cut climate pollution.
-
-## b. Appreciated Aspects
-
-1.  The use of a dynamic bubble chart to emphasise on rankings to visualise on the leading countries’ emission contributions in 2022
-2.  The timeline graph shown in the visualization makes use of future predictions by 2030 to show the CO2 estimated emissions by country. The height of the charts albeit difficult to see due to the CSS, is to scale for their specific unit.
-3.  The visualization uses different hues of the same red colour to describe the intensity of the data.
-
-## c. Problematic Aspects
-
-### i. Bubble Chart
-
-1.  The chart does not provide a legend for the measurement metrics used. It is unclear what the size of the bubble represents.
-2.  The chart does not provide a clear ranking of the top 20 countries’ emission contributions. It is hard to differentiate the mid-range sizes.
-
-### ii. Horizontal Bar Chart
-
-1.  It did not specify the type of emission that is required for reduction. Stating as total or per capita emission will convey different meaning of what action that country should take to reduce them. For instance, per capita will be revamping individuals lifestyle such as the current change of adopting EVs. Total will be introducing industry standard policies that affects industrial sectors like transportation.
-2.  Horizontal bar chart shows misleading information that Nigeria should contribute more to the greenhouse gases emission. The red colour for both sides also contributes to the misled of information.
-
-## d. Points for Improvement
-
-1.  More numerical figures and labels could be used with the bubble chart and graphs to convey the content more effectively at a glance.
-2.  A historical chart of the top countries contribution to climate impact can be shown thus identifying the actions taken by them to reduce global emissions.
-3.  Provide a legend for the bubble chart to show the size of the bubble represents the amount of emissions.
-4.  (Feedback)
-
--   Use world map to represent the data
--   Highlight top 10 (label countries)
--   Show 2 world maps to show current emission, and the other to show countries who should reduce emission in GHG
-
-## e. Publicly Available Data
-
-### i. Climate Watch Data
-
-1.  Limited data till 2020 (able to filter by sectors contribution, gases, countries, etc): [Climate Watch Data](https://www.climatewatchdata.org/ghg-emissions?breakBy=sector&regions=BRN%2CKHM%2CIDN%2CLAO%2CMYS%2CMMR%2CPHL%2CSGP%2CTHA%2CVNM&sectors=agriculture%2Cbunker-fuels%2Cindustrial-processes%2Cland-use-change-and-forestry%2Cwaste%2Cenergy&source=Climate%20Watch)
-
-### ii. Climate Action Tracker
-
-1.  Able to filter by sector and various indicators, this video explains on the different tool provided. Limited data of Southeast Asia countries, can look into changing focus to worldwide contributors: [Climate Action Tracker](https://climateactiontracker.org/cat-data-explorer/sector-indicators/?sector=Transport%20Road&indicator=EV%20stock%20shares&country=SGP&country=IDN&country=PHL&scenario=benchmark&scenario=projected_current_policy&mode=countries)
-2.  [GHG Emission Analysis](https://climateactiontracker.org/cat-data-explorer/country-emissions/)
-
-### iii. Our World in Data
-
-1.  [Github Bank](https://github.com/owid/co2-data?tafb=readme-ov-file)
-2.  [Total GHG](https://ourworldindata.org/grapher/total-ghg-emissions?tab=table)
-3.  [Per Capita GHG](https://ourworldindata.org/grapher/per-capita-ghg-emissions?tab=table)
-
-### iv. EPA
-
-1.  Interactive and various form to visualize data and charts: [EPA](https://www.epa.gov/ghgreporting/ghgrp-reported-data)
-
-### v. The World Bank
-
-1.  [Population Data](https://data.worldbank.org/indicator/SP.POP.TOTL?end=2022&start=2022&view=bar)
-
-# 2. Data Collection and Preprocessing
-
-## a. Import packages
-
-```{r}
+## -----------------------------------------------------------------------------
 #| label: required-packages
 #| echo: true
 #| message: false
@@ -85,15 +11,11 @@ library(htmltools)
 library(rnaturalearth)
 library(sf)
 library(tidyverse)
-```
 
-## b. View Data
 
-### i. Reading of **Greenhouse Gas Emissions Per Capita Dataset**
-
-```{r}
+## -----------------------------------------------------------------------------
 #| label: dataset-part-e-iii-3
-#| 
+#|
 # Read the CSV file
 per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
 
@@ -101,11 +23,9 @@ per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
 per_capita_ghg <- as_tibble(per_capita_ghg)
 
 print(per_capita_ghg)
-```
 
-### ii. Reading of **Total Greenhouse Gas Emission Analysis Dataset**
 
-```{r}
+## -----------------------------------------------------------------------------
 #| label: dataset-part-e-ii-2
 
 analysis_ghg <- read.csv("ghg_emission_analysis_dataset.csv")
@@ -113,11 +33,9 @@ analysis_ghg <- read.csv("ghg_emission_analysis_dataset.csv")
 analysis_ghg <- as_tibble(analysis_ghg)
 
 print(analysis_ghg)
-```
 
-### iii. Reading of **Population From 1960 - 2022 Dataset**
 
-```{r}
+## -----------------------------------------------------------------------------
 #| label: dataset-part-e-v-1
 
 population <- read.csv("total_population_1960_2022.csv", skip=4)
@@ -125,13 +43,9 @@ population <- read.csv("total_population_1960_2022.csv", skip=4)
 population <- as_tibble(population)
 
 print(population)
-```
 
-## c. Clean
 
-### i. Remove NAs and renamed column from **Greenhouse Gas Emissions Per Capita Dataset**
-
-```{r}
+## -----------------------------------------------------------------------------
 # Rename the per capita emissions column
 colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Entity"] <- "country"
 colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "per_capita_ghg_emissions_t"
@@ -144,32 +58,24 @@ colnames(per_capita_ghg) <- tolower(colnames(per_capita_ghg))
 per_capita_ghg_cleaned <- drop_na(per_capita_ghg, per_capita_ghg_emissions_t)
 
 print(per_capita_ghg_cleaned)
-```
 
-### ii. Rename column from **Total Population Dataset**
 
-```{r}
+## -----------------------------------------------------------------------------
 colnames(population)[colnames(population) == "Country.Name"] <- "country"
 colnames(population)[colnames(population) == "Country.Code"] <- "code"
 colnames(population)[colnames(population) == "X2022"] <- "population"
 
 print(population)
-```
 
-## d. Process
 
-### i. Filter emissions happening in 2022 from **Greenhouse Gas Emissions Per Capita Dataset**
-
-```{r}
+## -----------------------------------------------------------------------------
 per_capita_ghg_cleaned_2022 <- filter(per_capita_ghg_cleaned, year == 2022)
 per_capita_ghg_cleaned_2022 <- mutate(per_capita_ghg_cleaned_2022, code = if_else(country == "European Union (27)", "EU27", code))
 
 print(per_capita_ghg_cleaned_2022)
-```
 
-### ii. Filter projected reduction emission by 2030 to keep global temperature rise below 1.5°C from **Greenhouse Gas Emission Analysis Dataset**
 
-```{r}
+## -----------------------------------------------------------------------------
 analysis_ghg_projected_2030 <- filter(analysis_ghg, grepl("1.5", scenario), indicator == "Equity boundaries (absolute)", year == 2030)
 
 analysis_ghg_projected_2030 <- analysis_ghg_projected_2030 %>%
@@ -178,30 +84,24 @@ analysis_ghg_projected_2030 <- analysis_ghg_projected_2030 %>%
   rename(projected_ghg_emissions_t = value)
 
 print(analysis_ghg_projected_2030)
-```
 
-### iii. Filter population data for 2022 from **Total Population Dataset**
 
-```{r}
+## -----------------------------------------------------------------------------
 population_cleaned_2022 <- population %>%
   select(code, population)
 
 print(population_cleaned_2022)
-```
 
-### iv. Merge **Per Capita GHG 2022** and **Population 2022** datasets based on the country code
 
-```{r}
+## -----------------------------------------------------------------------------
 ghg_2022 <-
   left_join(per_capita_ghg_cleaned_2022, population_cleaned_2022, by = "code") |>
   select(country, code, per_capita_ghg_emissions_t, population)
 
 print(ghg_2022)
-```
 
-### v. Merge the **GHG 2022** and **Projected GHG 2030** datasets based on the country code
 
-```{r}
+## -----------------------------------------------------------------------------
 ghg_2022_projected_2030 <- left_join(ghg_2022, analysis_ghg_projected_2030, by = c("code" = "region"))
 ghg_2022_projected_2030 <-
   mutate(ghg_2022_projected_2030, country = case_when(
@@ -212,25 +112,9 @@ ghg_2022_projected_2030 <-
   select(country, code, per_capita_ghg_emissions_t, population, pc_projected_ghg_emissions_t)
 
 print(ghg_2022_projected_2030)
-```
 
-# 3. Visualization
 
-## a. World Emission Chart using World Map
-
-#### Previous Chart
-
--   Bubble chart by size to show the ranking of the countries ![Original Total Greenhouse Gas Emissions](original_chart/total_ghg_emissions_bbchart.png)
-
-#### Improved Elements
-
--   Used world map to show the data
--   Used label to show the ranking of the countries
--   Used color palette to show the intensity of the data
-
-> **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
-
-```{r}
+## -----------------------------------------------------------------------------
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
@@ -264,9 +148,9 @@ world_simplified <- world_pc %>%
     pc_projected_ghg_emissions_t, 
     label, 
   )
-```
 
-```{r}
+
+## -----------------------------------------------------------------------------
 # Individual label offsets
 label_offsets <- data.frame(
   country = c("Qatar", "Bahrain", "Brunei", "Kuwait", "Trinidad and Tobago", 
@@ -283,9 +167,9 @@ world_simplified <- world_simplified %>%
   mutate(centroid = st_centroid(geometry),
          x = st_coordinates(centroid)[,1],
          y = st_coordinates(centroid)[,2])
-```
 
-```{r}
+
+## -----------------------------------------------------------------------------
 #| fig.height: 7
 #| fig.width: 9
 
@@ -360,4 +244,4 @@ ggplot(data = world_simplified) +
     x = NULL,
     y = NULL
   )
-```
+

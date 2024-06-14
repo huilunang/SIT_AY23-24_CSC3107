@@ -1,0 +1,76 @@
+---
+title: Visualizing World's Contribution to Climate Change (Greenhouse Gases Emission)
+format: 
+  poster-typst:
+    size: "33x23"
+    poster-authors: "Ang Hui Lun, Poh Kuang Yi, Muhammad Nur Dinie, Lim Wei Wen, Efilio Yodia Garcia, Tan Ang Kang"
+    departments: "P4 Seashell"
+    institution-logo: "./images/sit-logo.png"
+    footer-text: "University Of Glasgow"
+    footer-emails: "to be filled later"
+execute:
+  echo: false
+knitr: 
+  opts_chunk:
+    dev: svglite
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(knitr)
+library(gridExtra)
+library(png)
+library(grid)
+purl("CSC3107_Assignment_Seashell.qmd")
+source("CSC3107_Assignment_Seashell.R")
+```
+
+# Introduction
+ 
+Climate change is global issue that has been affecting the world for decades. It has been a challenge for the world to undo what we they done to the environment. The introduction of modern industrialization has been the main cause of the production of these greenhouse gases[^jeeven_identification_2020]. This led to the increase in the surface temperature of the earth and emits infrared radiation which prevents the earth from cooling down[^tavassoli_effective_2023], resulting in an increase in heat waves, rainfall and extreme climate events.
+
+[^jeeven_identification_2020]: Jeeven Ravi et al., "Identification of Greenhouse Gases Emission Thorough Exploration of The Emission from Different Sectors" 2020 6th International Conference on Computing Engineering and Design (ICCED), 2020, pp. 1-7
+[^tavassoli_effective_2023]: M. Tavassoli et al., "Comparison of effective greenhouse gases and global warming" 2023 8th International Conference on Technology and Energy Management (ICTEM), 2023, pp 1-5
+
+We hope to raise awareness on the world's contribution in greenhouse gases emission and the effort needed to cut these emission to decline climate change and global warming. We have built a visualization of the top 10 greenhouse gases emitters (per capita) in 2022. 
+
+
+# Previous Visualization
+
+```{r}
+# Load images
+plot1 <- readPNG("./images/ghgemission_initial.png")
+plot2 <- readPNG("./images/left_right_bar_chart.png")
+
+grid.arrange(rasterGrob(plot1), rasterGrob(plot2), ncol=2)
+```
+
+```{r}
+##| label: ghgemission-initial
+##| fig-cap: "Total greenhouse gas emissions by country in 2022"
+##| out-width: "100%"
+
+# include_graphics("./images/ghgemission_initial.png")
+```
+
+
+# Appreciated Aspects
+
+*   The use of a dynamic bubble chart to emphasize on rankings to visualize on the leading countries’ emission contributions in 2022
+*   The timeline graph shown in the visualization makes use of future predictions by 2030 to show the CO2 estimated emissions by country. The height of the charts albeit difficult to see due to the CSS, is to scale for their specific unit.
+*   The visualization uses different hues of the same red colour to describe the intensity of the data.
+*   Shows metric and amount of greenhouse gas emitted by countries outside of the top 20 when bubble is hovered.  
+
+```{r}
+#| label: bubble-hover-not-top20
+#| fig-cap: "Zoomed in screenshot of the bubble chart when hovered over to show metric and amount of greenhouse gas emitted by country outside of the top 20"
+#| out-width: "50%"
+
+include_graphics("./images/bubble_hover.png")
+```
+
+# Suggested Improvements
+
+
