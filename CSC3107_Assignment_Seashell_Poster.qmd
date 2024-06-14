@@ -20,9 +20,6 @@ knitr:
 #| include: false
 
 library(knitr)
-library(gridExtra)
-library(png)
-library(grid)
 purl("CSC3107_Assignment_Seashell.qmd")
 source("CSC3107_Assignment_Seashell.R")
 ```
@@ -40,19 +37,14 @@ We hope to raise awareness on the world's contribution in greenhouse gases emiss
 # Previous Visualization
 
 ```{r}
-# Load images
-plot1 <- readPNG("./images/ghgemission_initial.png")
-plot2 <- readPNG("./images/left_right_bar_chart.png")
+#| label: ghgemission-initial
+#| fig-cap: 
+#| - "Percentage of emissions reduction needed by 2030, among current top emitters"
+#| - "Total greenhouse gas emissions by country in 2022"
+#| out-width: "87%"
 
-grid.arrange(rasterGrob(plot1), rasterGrob(plot2), ncol=2)
-```
-
-```{r}
-##| label: ghgemission-initial
-##| fig-cap: "Total greenhouse gas emissions by country in 2022"
-##| out-width: "100%"
-
-# include_graphics("./images/ghgemission_initial.png")
+include_graphics("./images/left_right_bar_chart.png")
+include_graphics("./images/ghgemission_initial.png")
 ```
 
 
@@ -73,4 +65,44 @@ include_graphics("./images/bubble_hover.png")
 
 # Suggested Improvements
 
+1.    *More numerical figures and labels* could be used with the bubble chart and graphs to convey the content more effectively at a glance.
+1.    *Provide a legend* for the bubble chart to show the size of the bubble represents the amount of emissions.
+1.    *Use the choropleth map* to show top 10 emitters of the world.
+1.    *Provide a line to map* the country labels and the emitted amount to the respective country in the choropleth map.
+1.    *Use a bubble plot* to represent the recommended emission reduction for the top 10 country
 
+# Implementation
+
+## Data
+*   Data on CO2 and Greenhouse Gas Emissions by Our World in Data[^co2_ghg_owd_2024]
+*   Annual Greenhouse Gas Emissions by Our World in Data[^ghg_owd_2024]
+*   Greenhouse Gases Per Capita by Our World in Data[^ghg_percap_owd_2024]
+
+[^co2_ghg_owd_2024]: https://github.com/owid/co2-data?tafb=readme-ov-file
+[^ghg_owd_2024]: https://ourworldindata.org/grapher/total-ghg-emissions?tab=table
+[^ghg_percap_owd_2024]: https://ourworldindata.org/grapher/per-capita-ghg-emissions?tab=table
+
+## Software
+We used the Quarto publication framework and the R programming language, along with the following third-party packages:
+
+*   *tidyverse* for data transformation, including *ggplot2* for visualization.
+*   *rnaturalearth* for the chrolopleth map.
+*   *ggrepel* provides geoms for overlapping text labels.
+*   *ggtext* <insert description>
+*   *htmltools* <insert description>
+*   *sf* <insert description>
+*   *knitr* for dynamic document generation.
+
+# Improved Visualization
+
+```{r}
+#| label: ghgemission-improved
+#| fig-cap: "Combined total emission per capital & amount of recommended reduction of greenhouse gases."
+#| out-width: "100%"
+
+include_graphics("./images/percap_ghgemission_improved.png")
+```
+
+# Further Suggestions For Interactivity
+
+# Conclusion
