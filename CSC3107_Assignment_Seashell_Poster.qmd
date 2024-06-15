@@ -65,11 +65,15 @@ include_graphics("./images/bubble_hover.png")
 
 # Suggested Improvements
 
-1.    *More numerical figures and labels* could be used with the bubble chart and graphs to convey the content more effectively at a glance.
+1.    *More numerical figures and labels* could be used with the  bubble chart and graphs to convey the content more effectively at a glance.
 1.    *Provide a legend* for the bubble chart to show the size of the bubble represents the amount of emissions.
 1.    *Use the choropleth map* to show top 10 emitters of the world.
 1.    *Provide a line to map* the country labels and the emitted amount to the respective country in the choropleth map.
 1.    *Use a bubble plot* to represent the recommended emission reduction for the top 10 country
+1.    *Use a choropleth map* to visualize the total greenhouse gas emissions per capita globally. This will highlight the emission contributions of leading countries relative to others, making it easier to identify key emitters
+1.    *Leverage on a bubble plot* to to represent the recommended emission reduction for the top 10 countries, on top of the choropleth map. The bubble sizes distinctly represent the required emission reduction for each country.
+1.    *Use colour palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
+1.    *The integration of bubble plot on the choropleth map combines the information from two graphs* into a single comprehensive visualization.
 
 # Implementation
 
