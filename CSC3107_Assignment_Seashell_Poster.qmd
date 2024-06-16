@@ -1,15 +1,22 @@
 ---
-title: Visualizing World's Contribution to Climate Change (Greenhouse Gases Emission)
+title: Visualizing Countries Contributions to Climate Change (Greenhouse Gases Emission)
 format: 
   poster-typst:
     size: "33x23"
+    
     poster-authors: "Ang Hui Lun, Poh Kuang Yi, Muhammad Nur Dinie, Lim Wei Wen, Efilio Yodia Garcia, Tan Ang Kang"
+    
     departments: "P4 Seashell"
+    
     institution-logo: "./images/sit-logo.png"
+    
     footer-text: "University Of Glasgow"
-    footer-emails: "to be filled later"
+    
+    footer-emails: "2201377, 2201354, 2200936, 2201116, 2200516, 2203210"
+    
 execute:
   echo: false
+  
 knitr: 
   opts_chunk:
     dev: svglite
@@ -26,13 +33,14 @@ source("CSC3107_Assignment_Seashell.R")
 
 # Introduction
  
-Climate change is global issue that has been affecting the world for decades. It has been a challenge for the world to undo what we they done to the environment. The introduction of modern industrialization has been the main cause of the production of these greenhouse gases[^jeeven_identification_2020]. This led to the increase in the surface temperature of the earth and emits infrared radiation which prevents the earth from cooling down[^tavassoli_effective_2023], resulting in an increase in heat waves, rainfall and extreme climate events.
+Climate change is a global issue that has significantly impacted the environment for decades. Reversing the damage caused by human activity, particularly modern industrialization, remains a daunting challenge. The rise in greenhouse gas emissions, largely driven by industrial activities gases[^jeeven_identification_2020], has led to an increase in the Earth's surface temperature, trapping infrared radiation and preventing the planet from cooling down [^tavassoli_effective_2023]. This phenomenon has resulted in more frequent heat waves, intense rainfall, and other extreme climate events. 
 
 [^jeeven_identification_2020]: Jeeven Ravi et al., "Identification of Greenhouse Gases Emission Thorough Exploration of The Emission from Different Sectors" 2020 6th International Conference on Computing Engineering and Design (ICCED), 2020, pp. 1-7
 [^tavassoli_effective_2023]: M. Tavassoli et al., "Comparison of effective greenhouse gases and global warming" 2023 8th International Conference on Technology and Energy Management (ICTEM), 2023, pp 1-5
 
-We hope to raise awareness on the world's contribution in greenhouse gases emission and the effort needed to cut these emission to decline climate change and global warming. We have built a visualization of the top 10 greenhouse gases emitters (per capita) in 2022. 
+Addressing greenhouse gas emissions is more urgent than ever. Communicating their sources and impacts is crucial for raising awareness and encouraging action. In this project, we built on CNN's visualizations of emissions by country[^CNN_article_2024] to highlight contributions to greenhouse gas emissions and emphasize the efforts needed to combat climate change. We developed a visualization of the top 10 greenhouse gas emitters per capita in 2022, providing a more comprehensive and engaging representation of the data.
 
+[^CNN_article_2024]: https://edition.cnn.com/interactive/2023/12/us/countries-climate-change-emissions-cop28/
 
 # Previous Visualization
 
@@ -41,7 +49,7 @@ We hope to raise awareness on the world's contribution in greenhouse gases emiss
 #| fig-cap: 
 #| - "Percentage of emissions reduction needed by 2030, among current top emitters"
 #| - "Total greenhouse gas emissions by country in 2022"
-#| out-width: "87%"
+#| out-width: "70%"
 
 include_graphics("./images/left_right_bar_chart.png")
 include_graphics("./images/ghgemission_initial.png")
@@ -58,7 +66,7 @@ include_graphics("./images/ghgemission_initial.png")
 ```{r}
 #| label: bubble-hover-not-top20
 #| fig-cap: "Zoomed in screenshot of the bubble chart when hovered over to show metric and amount of greenhouse gas emitted by country outside of the top 20"
-#| out-width: "50%"
+#| out-width: "30%"
 
 include_graphics("./images/bubble_hover.png")
 ```
@@ -67,12 +75,10 @@ include_graphics("./images/bubble_hover.png")
 
 1.    *More numerical figures and labels* could be used with the  bubble chart and graphs to convey the content more effectively at a glance.
 1.    *Provide a legend* for the bubble chart to show the size of the bubble represents the amount of emissions.
-1.    *Use the choropleth map* to show top 10 emitters of the world.
+1.    *Use the choropleth map* to show top 10 emitters of the world and visualize the total greenhouse gas emissions per capita globally. This will highlight the emission contributions of leading countries relative to others, making it easier to identify key emitters.
 1.    *Provide a line to map* the country labels and the emitted amount to the respective country in the choropleth map.
-1.    *Use a bubble plot* to represent the recommended emission reduction for the top 10 country
-1.    *Use a choropleth map* to visualize the total greenhouse gas emissions per capita globally. This will highlight the emission contributions of leading countries relative to others, making it easier to identify key emitters
-1.    *Leverage on a bubble plot* to to represent the recommended emission reduction for the top 10 countries, on top of the choropleth map. The bubble sizes distinctly represent the required emission reduction for each country.
-1.    *Use colour palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
+1.    *Leverage on a bubble plot* to represent the recommended emission reduction for the top 10 countries on top of the choropleth map, where the bubble sizes distinctly represent the required emission reduction for each country.
+1.    *Use a colour palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
 1.    *The integration of bubble plot on the choropleth map combines the information from two graphs* into a single comprehensive visualization.
 
 # Implementation
@@ -102,11 +108,15 @@ We used the Quarto publication framework and the R programming language, along w
 ```{r}
 #| label: ghgemission-improved
 #| fig-cap: "Combined total emission per capital & amount of recommended reduction of greenhouse gases."
-#| out-width: "100%"
+#| out-width: "85%"
 
 include_graphics("./images/percap_ghgemission_improved.png")
 ```
 
 # Further Suggestions For Interactivity
 
+Because our visualization was designed for a poster, interactive features were not included. However, we would like to suggest the following recommendations for enhancing interactivity. Include a time slider to visualize changes in greenhouse gas emissions and reduction targets over different years. This allows users to see trends and progress over time interactively. Enable zoom and pan functionality to allow users to explore specific regions in more detail. This is especially useful for closely examining areas with dense or high-emission data points.
+
 # Conclusion
+
+We successfully implemented all suggested improvements for the non-interactive visualization. By adding numerical figures, labels, and legends, the revised visualisation is more informative. The choropleth map highlights the top 10 emitters and global per capita emissions, making key contributors easy to identify. Lines mapping country labels and emissions enhance clarity, while bubble sizes for recommended reductions and a color palette for emission intensities ensure the visualization is comprehensive and readable.
