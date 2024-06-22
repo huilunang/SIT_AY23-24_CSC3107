@@ -86,6 +86,8 @@ library(rnaturalearth)
 library(sf)
 library(tidyverse)
 library(scales)
+library(mapview)
+library(rmapshaper)
 ```
 
 ## b. View Data
@@ -231,10 +233,31 @@ print(ghg_2022_projected_2030)
 
 > **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
 
+Ensure that the data obtained from open source is clean and free of any invalidity and inefficiencies by checking:
+
+-   Spatial type validity
+
+-   Number of geospatial data points is \< 10,000
+
 ```{r}
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
+# Check if the points in `world` are non-intersectting
+all(st_is_valid(world))
+
+# Check number of st features obtained from open source data
+# Recommended to generally have 10,000 < geospatial data points
+if(npts(world) >= 10000)
+{
+  print(sprintf("Reducing features on `world` for faster rendering from %d", npts(world)))
+  world <- ms_simplify(world)
+}
+# Check number of features in world data
+npts(world)
+```
+
+```{r}
 # Merge emissions data with world map
 world <- left_join(world, ghg_2022_projected_2030, by = c("name" = "country"))
 
@@ -349,7 +372,7 @@ ggplot(data = world_simplified) +
     color = bubble_color,
     alpha = 0.5
   ) +
-  scale_size(range = c(5, 15), name = "Projected Reduction") +
+  scale_size(range = c(0, 10), name = "Projected Reduction") +
   guides(
     fill = guide_colorbar(
       title.position = "top",  
