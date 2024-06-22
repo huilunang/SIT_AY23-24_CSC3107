@@ -243,7 +243,7 @@ Ensure that the data obtained from open source is clean and free of any invalidi
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
-# Check if the points in `world` are non-overlapping
+# Check if the points in `world` are non-intersectting
 all(st_is_valid(world))
 
 # Check number of st features obtained from open source data
