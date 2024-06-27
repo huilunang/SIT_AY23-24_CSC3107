@@ -372,7 +372,7 @@ ggplot(data = world_simplified) +
     color = bubble_color,
     alpha = 0.5
   ) +
-  scale_size(range = c(0, 10), name = "Projected Reduction") +
+  scale_size(range = c(0, 10), name = "Projected Reduce (%)") +
   guides(
     fill = guide_colorbar(
       title.position = "top",  
@@ -384,6 +384,7 @@ ggplot(data = world_simplified) +
     title = "<b>Per Capita Greenhouse Gas Emissions in 2022</b>", 
     subtitle = "<b>Top 10 Emitters</b>",
     caption = "Source: Our World in Data",
+    fill = "Per Capita GHG Emissions (t)",
     x = NULL,
     y = NULL
   )
