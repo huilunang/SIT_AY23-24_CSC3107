@@ -307,7 +307,6 @@ first_data_point <- top_10[1,]
 first_data_point
 ```
 
-
 ```{r}
 #| fig.height: 7
 #| fig.width: 9
@@ -393,7 +392,7 @@ main_map <- ggplot(data = world_simplified) +
 ```
 
 ```{r}
-zoom_factor <- 2  # Adjust the zoom factor as needed
+zoom_factor <- 5  # Adjust the zoom factor as needed
 first_data_point <- top_10[1,]  # Assuming top_10 contains data for top 10 emitters
 zoom_to <- c(first_data_point$x, first_data_point$y)
 lon_span <- 360 / 2^zoom_factor
@@ -410,46 +409,56 @@ lat_bounds <- c(zoom_to[2] - lat_span / 2, zoom_to[2] + lat_span / 2)
 # Filter the data for the mini-map around the top 1 emitter
 # mini_map_data <- st_crop(world_simplified, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
 
-# Create the mini-map
-mini_map <- ggplot() +
-  geom_sf(data = st_sfc(st_point(zoom_to), crs = 4326), color = "red", size = 1) +
-  coord_sf(xlim = lon_bounds, ylim = lat_bounds) +
-  geom_sf(data = world_simplified, aes(fill = per_capita_ghg_emissions_t), 
-          color = "black", 
-          size = 0.2) +
-  scale_fill_fermenter(breaks = pretty_breaks(n=9),
-                       palette = "YlOrRd",
-                       direction = 1) +
-  theme_bw() +
-  theme(
-    panel.grid.major = element_blank(), 
-    panel.grid.minor = element_blank(),
-    legend.position = "none",  # Remove legend for fill color
-    text = element_text(size = 5),
-    plot.title = element_markdown(),
-    plot.subtitle = element_markdown(),
-    axis.text = element_blank(),  # Remove axis text
-    axis.title = element_blank()  # Optionally remove axis titles
-  ) +
-  geom_sf_text(data = filter(world_simplified, ranking == 1),
-                aes(label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)),
-                size = 3,
-                fontface = "bold",
-                fill = scales::alpha("white", 0.65),
-                label.padding = unit(0.2, "lines"),
-                label.size = NA,  # Remove the label border
-                nudge_x = -0.5,  # Adjust label position
-                nudge_y = 0.5) +
-  guides(
-    fill = FALSE  # Remove the legend for fill color
-  )
+  # Create the mini-map
+  mini_map <- ggplot() +
+    annotate(
+      "rect", 
+      xmin = -180, xmax = 180, ymin = -90, ymax = 90, 
+      fill = "lightblue",  
+      color = NA
+    ) +
+    geom_sf(data = st_sfc(st_point(zoom_to), crs = 4326), size = 1) +
+  
+    geom_sf(data = world_simplified, aes(fill = per_capita_ghg_emissions_t), 
+            color = "black", 
+            size = 0.2) +
+    coord_sf(xlim = lon_bounds, ylim = lat_bounds) +
+    scale_fill_fermenter(
+      breaks = pretty_breaks(n=9),
+      palette = "YlOrRd",
+      direction = 1) +
+    theme_void() +
+    theme(
+      panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank(),
+      legend.position = "none",  # Remove legend for fill color
+      text = element_text(size = 5),
+      panel.border = element_rect(color = "black", fill = NA, size = 1),
+      plot.title = element_markdown(),
+      plot.subtitle = element_markdown(),
+      axis.text = element_blank(),  # Remove axis text
+      axis.title = element_blank()  # Optionally remove axis titles
+    ) +
+    geom_sf_text(
+      data = filter(world_simplified, ranking == 1),
+      aes(label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)),
+      size = 3,
+      fontface = "bold",
+      fill = scales::alpha("white", 0.65),
+      label.padding = unit(0.2, "lines"),
+      label.size = NA,  # Remove the label border
+      nudge_x = -0.5,  # Adjust label position
+      nudge_y = 1.5) +
+    
+    guides(
+      fill = FALSE  # Remove the legend for fill color
+    )
 
 # Combine the main map and the mini-map using cowplot
-combined_plot <- cowplot::ggdraw() +
-  cowplot::draw_plot(main_map) +
-  cowplot::draw_plot(mini_map, x = 0.65, y = 0.2, width = 0.25, height = 0.25)
+
+combined_plot <- cowplot::ggdraw(main_map) +
+  cowplot::draw_plot(mini_map, x = 0.741, y = 0.263, width = 0.17, height = 0.17)
 
 # Display the combined plot
 combined_plot
 ```
-
