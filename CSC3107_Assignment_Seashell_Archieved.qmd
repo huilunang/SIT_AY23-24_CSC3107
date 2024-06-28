@@ -439,6 +439,7 @@ map %>%
 -   Used distinct color to show the current and projected emission
 -   Show the percentage reduction of the emission
 -   Focus on the top 10 contributors that should reduce emission
+
 ```{r}
 # eu27_code <- c("AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE") #world-adm0_a3
 

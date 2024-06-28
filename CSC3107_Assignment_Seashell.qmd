@@ -88,6 +88,7 @@ library(tidyverse)
 library(scales)
 library(mapview)
 library(rmapshaper)
+library(cowplot)
 ```
 
 ## b. View Data
@@ -230,6 +231,7 @@ print(ghg_2022_projected_2030)
 -   Used world map to show the data
 -   Used label to show the ranking of the countries
 -   Used color palette to show the intensity of the data
+-   Used Equal Earth Projection (ESRI:54035) to accurately preserve the relative sizes of areas on the Earth’s surface
 
 > **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
 
@@ -266,17 +268,6 @@ world_pc <- world %>%
   arrange(desc(per_capita_ghg_emissions_t)) %>%
   mutate(ranking = row_number())
 
-# Add ranking and labels
-world_pc$label <- lapply(
-  sprintf(
-    "<strong>%d. %s</strong><br/>%.2f t",
-    world_pc$ranking, 
-    world_pc$iso_a3_eh, 
-    world_pc$per_capita_ghg_emissions_t
-  ), 
-  HTML
-)
-
 # Create simplified dataframe
 world_simplified <- world_pc %>%
   select(
@@ -285,18 +276,19 @@ world_simplified <- world_pc %>%
     code,
     geometry,
     per_capita_ghg_emissions_t, 
-    pc_projected_ghg_emissions_t, 
-    label, 
+    pc_projected_ghg_emissions_t
   )
 ```
 
 ```{r}
+# Top 10 Emitters
+top_10 <- subset(world_simplified, ranking <= 10)
+
 # Individual label offsets
 label_offsets <- data.frame(
-  country = c("Qatar", "Bahrain", "Brunei", "Kuwait", "Trinidad and Tobago", 
-              "United Arab Emirates", "Oman", "Mongolia", "Saudi Arabia", "Australia"),
-  offset_x = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-  offset_y = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  country = top_10$name,
+  offset_x = rep(0, nrow(top_10)),
+  offset_y = rep(0, nrow(top_10))
 )
 
 # Merge offsets data
@@ -307,7 +299,14 @@ world_simplified <- world_simplified %>%
   mutate(centroid = st_centroid(geometry),
          x = st_coordinates(centroid)[,1],
          y = st_coordinates(centroid)[,2])
+top_10 <- subset(world_simplified, ranking <= 10)
+first_data_point <- top_10[1,]
 ```
+
+```{r}
+first_data_point
+```
+
 
 ```{r}
 #| fig.height: 7
@@ -321,7 +320,8 @@ bubble_color <- "#800026"
 set.seed(1234567890)
 
 # Create choropleth map
-ggplot(data = world_simplified) +
+main_map <- ggplot(data = world_simplified) +
+  coord_sf(crs = "ESRI:54035") +
   annotate(
     "rect", 
     xmin = -180, xmax = 180, ymin = -90, ymax = 90, 
@@ -349,30 +349,32 @@ ggplot(data = world_simplified) +
     plot.subtitle = element_markdown()
   ) +
   geom_label_repel(
-    data = subset(world_simplified, ranking <= 10),
+    data = top_10,
     aes(
       x = x + offset_x,
       y = y + offset_y,
-      label = sprintf("%d. %s\n%.2f t", ranking, code, per_capita_ghg_emissions_t),
+      label = sprintf("%d. %s", ranking, code),
       fontface = "bold"
     ),
     size = 3,
-    box.padding = 0.5,
+    box.padding = 0.7,
     point.padding = 0.5,
     max.overlaps = Inf,
-    seed = 1234567890
+    seed = 1234567890,
+    fill = scales::alpha("white", 0.65),
+    label.size = 0.1
   ) +
   geom_point(
-    data = subset(world_simplified, ranking <= 10),
+    data = top_10,
     aes(
       x = x,
       y = y,
       size = pc_projected_ghg_emissions_t
     ),
     color = bubble_color,
-    alpha = 0.5
+    alpha = 0.4
   ) +
-  scale_size(range = c(0, 10), name = "Projected Reduce (%)") +
+  scale_size(range = c(2.5, 10), name = "Projected Reduce (%)") +
   guides(
     fill = guide_colorbar(
       title.position = "top",  
@@ -389,3 +391,65 @@ ggplot(data = world_simplified) +
     y = NULL
   )
 ```
+
+```{r}
+zoom_factor <- 2  # Adjust the zoom factor as needed
+first_data_point <- top_10[1,]  # Assuming top_10 contains data for top 10 emitters
+zoom_to <- c(first_data_point$x, first_data_point$y)
+lon_span <- 360 / 2^zoom_factor
+lat_span <- 180 / 2^zoom_factor
+lon_bounds <- c(zoom_to[1] - lon_span / 2, zoom_to[1] + lon_span / 2)
+lat_bounds <- c(zoom_to[2] - lat_span / 2, zoom_to[2] + lat_span / 2)
+
+# Calculate zoom range around the top 1 emitter
+#xmin <- first_data_point$x - zoom_factor
+#xmax <- first_data_point$x + zoom_factor
+#ymin <- first_data_point$y - zoom_factor
+#ymax <- first_data_point$y + zoom_factor - 55
+
+# Filter the data for the mini-map around the top 1 emitter
+# mini_map_data <- st_crop(world_simplified, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
+
+# Create the mini-map
+mini_map <- ggplot() +
+  geom_sf(data = st_sfc(st_point(zoom_to), crs = 4326), color = "red", size = 1) +
+  coord_sf(xlim = lon_bounds, ylim = lat_bounds) +
+  geom_sf(data = world_simplified, aes(fill = per_capita_ghg_emissions_t), 
+          color = "black", 
+          size = 0.2) +
+  scale_fill_fermenter(breaks = pretty_breaks(n=9),
+                       palette = "YlOrRd",
+                       direction = 1) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    legend.position = "none",  # Remove legend for fill color
+    text = element_text(size = 5),
+    plot.title = element_markdown(),
+    plot.subtitle = element_markdown(),
+    axis.text = element_blank(),  # Remove axis text
+    axis.title = element_blank()  # Optionally remove axis titles
+  ) +
+  geom_sf_text(data = filter(world_simplified, ranking == 1),
+                aes(label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)),
+                size = 3,
+                fontface = "bold",
+                fill = scales::alpha("white", 0.65),
+                label.padding = unit(0.2, "lines"),
+                label.size = NA,  # Remove the label border
+                nudge_x = -0.5,  # Adjust label position
+                nudge_y = 0.5) +
+  guides(
+    fill = FALSE  # Remove the legend for fill color
+  )
+
+# Combine the main map and the mini-map using cowplot
+combined_plot <- cowplot::ggdraw() +
+  cowplot::draw_plot(main_map) +
+  cowplot::draw_plot(mini_map, x = 0.65, y = 0.2, width = 0.25, height = 0.25)
+
+# Display the combined plot
+combined_plot
+```
+
