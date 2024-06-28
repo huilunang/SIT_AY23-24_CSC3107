@@ -308,8 +308,8 @@ first_data_point
 ```
 
 ```{r}
-#| fig.height: 7
-#| fig.width: 9
+#| fig.height: 15
+#| fig.width: 15
 
 # Set colour pallete
 #ylOrRd <- c("#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026") # Can remove this if you want to. Or even put the bubble_color HEXA values directly into the parameter
@@ -333,7 +333,7 @@ main_map <- ggplot(data = world_simplified) +
     size = 0.2
   ) +
   scale_fill_fermenter(
-    breaks = pretty_breaks(n=9),
+    breaks = pretty_breaks(n=8), # for 0t to 80t emissions
     palette = "YlOrRd",
     direction = 1
   ) +
@@ -341,8 +341,10 @@ main_map <- ggplot(data = world_simplified) +
   theme(
     panel.grid.major = element_blank(), 
     panel.grid.minor = element_blank(),
+    legend.frame = element_rect(),
     legend.position = "bottom",
-    legend.key.width = unit(1, "cm"),
+    legend.key.width = unit(0.6, "cm"), # Increase the width of the legend key
+    legend.key.height = unit(0.5, "cm"), # Increase the height of the legend key
     text = element_text(size = 12),
     plot.title = element_markdown(),
     plot.subtitle = element_markdown()
@@ -429,9 +431,6 @@ lat_bounds <- c(zoom_to[2] - lat_span / 2, zoom_to[2] + lat_span / 2)
       direction = 1) +
     theme_void() +
     theme(
-      panel.grid.major = element_blank(), 
-      panel.grid.minor = element_blank(),
-      legend.position = "none",  # Remove legend for fill color
       text = element_text(size = 5),
       panel.border = element_rect(color = "black", fill = NA, size = 1),
       plot.title = element_markdown(),
@@ -457,7 +456,7 @@ lat_bounds <- c(zoom_to[2] - lat_span / 2, zoom_to[2] + lat_span / 2)
 # Combine the main map and the mini-map using cowplot
 
 combined_plot <- cowplot::ggdraw(main_map) +
-  cowplot::draw_plot(mini_map, x = 0.741, y = 0.263, width = 0.17, height = 0.17)
+  cowplot::draw_plot(mini_map, x = 0.746, y = 0.255, width = 0.17, height = 0.17)
 
 # Display the combined plot
 combined_plot
