@@ -385,7 +385,7 @@ main_map <- ggplot(data = world_simplified) +
   ) +
   labs(
     title = "<b>Per Capita Greenhouse Gas Emissions in 2022</b>", 
-    subtitle = "<b>Top 10 Emitters</b>",
+    subtitle = "<b>Top 10 Emitters in tonnes (t)</b>",
     caption = "Source: Our World in Data",
     fill = "Per Capita GHG Emissions (t)",
     x = NULL,
