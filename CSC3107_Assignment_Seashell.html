@@ -448,7 +448,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Used world map to show the data</li>
 <li>Used label to show the ranking of the countries</li>
 <li>Used color palette to show the intensity of the data</li>
-<li>Used Equal Earth Projection (ESRI:54035) to accurately preserve the relative sizes of areas on the Earth’s surface</li>
+<li>Used Behrmann Projection (ESRI:54017) to accurately preserve the relative sizes of areas on the Earth’s surface</li>
 </ul>
 <blockquote class="blockquote">
 <p><strong>Note</strong>: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.</p>
@@ -470,53 +470,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 1 feature and 9 fields
-Active geometry column: geometry
-Geometry type: POLYGON
-Dimension:     XY
-Bounding box:  xmin: 50.80439 ymin: 24.60723 xmax: 51.60195 ymax: 25.98145
-Geodetic CRS:  WGS 84
-  ranking  name code per_capita_ghg_emissions_t pc_projected_ghg_emissions_t
-1       1 Qatar  QAT                    70.5216                           NA
-  offset_x offset_y                       geometry                  centroid
-1        0        0 POLYGON ((51.26797 24.60723... POINT (51.21559 25.30984)
-         x        y
-1 51.21559 25.30984</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Coordinate system already present. Adding new coordinate system, which will
-replace the existing one.</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.
-ℹ Please use the `linewidth` argument instead.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in layer_sf(data = data, mapping = mapping, stat = stat, geom =
-GeomText, : Ignoring unknown parameters: `fill`, `label.padding`, and
-`label.size`</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: The `&lt;scale&gt;` argument of `guides()` cannot be `FALSE`. Use "none" instead as
-of ggplot2 3.3.4.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 6 rows containing missing values or values outside the scale range
-(`geom_point()`).</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in st_point_on_surface.sfc(sf::st_zm(x)): st_point_on_surface may not
-give correct results for longitude/latitude data</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="CSC3107_Assignment_Seashell_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="CSC3107_Assignment_Seashell_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

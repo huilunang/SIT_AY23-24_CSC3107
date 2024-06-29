@@ -97,7 +97,7 @@ library(cowplot)
 
 ```{r}
 #| label: dataset-part-e-iii-3
-#| 
+
 # Read the CSV file
 per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
 
@@ -136,23 +136,24 @@ print(population)
 ### i. Remove NAs and renamed column from **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
+#| label: clean-dataset-i
+
 # Rename the per capita emissions column
 colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Entity"] <- "country"
 colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "per_capita_ghg_emissions_t"
 colnames(per_capita_ghg) <- tolower(colnames(per_capita_ghg))
 
-# Display total GHG emission column as a whole number
-# per_capita_ghg$per_capita_ghg_emissions_t <- as.double(per_capita_ghg$per_capita_ghg_emissions_t)
-
 # Remove NAs from per capita emissions column
 per_capita_ghg_cleaned <- drop_na(per_capita_ghg, per_capita_ghg_emissions_t)
 
-print(per_capita_ghg_cleaned)
+per_capita_ghg_cleaned
 ```
 
 ### ii. Rename column from **Total Population Dataset**
 
 ```{r}
+#| label: clean-dataset-ii
+
 colnames(population)[colnames(population) == "Country.Name"] <- "country"
 colnames(population)[colnames(population) == "Country.Code"] <- "code"
 colnames(population)[colnames(population) == "X2022"] <- "population"
@@ -165,6 +166,8 @@ print(population)
 ### i. Filter emissions happening in 2022 from **Greenhouse Gas Emissions Per Capita Dataset**
 
 ```{r}
+#| label: process-dataset-i
+
 per_capita_ghg_cleaned_2022 <- filter(per_capita_ghg_cleaned, year == 2022)
 per_capita_ghg_cleaned_2022 <- mutate(per_capita_ghg_cleaned_2022, code = if_else(country == "European Union (27)", "EU27", code))
 
@@ -174,6 +177,8 @@ print(per_capita_ghg_cleaned_2022)
 ### ii. Filter projected reduction emission by 2030 to keep global temperature rise below 1.5°C from **Greenhouse Gas Emission Analysis Dataset**
 
 ```{r}
+#| label: process-dataset-ii
+
 analysis_ghg_projected_2030 <- filter(analysis_ghg, grepl("1.5", scenario), indicator == "Equity boundaries (absolute)", year == 2030)
 
 analysis_ghg_projected_2030 <- analysis_ghg_projected_2030 %>%
@@ -181,31 +186,37 @@ analysis_ghg_projected_2030 <- analysis_ghg_projected_2030 %>%
   mutate(value = value * 1000000) %>%
   rename(projected_ghg_emissions_t = value)
 
-print(analysis_ghg_projected_2030)
+analysis_ghg_projected_2030
 ```
 
 ### iii. Filter population data for 2022 from **Total Population Dataset**
 
 ```{r}
+#| label: process-dataset-iii
+
 population_cleaned_2022 <- population %>%
   select(code, population)
 
-print(population_cleaned_2022)
+population_cleaned_2022
 ```
 
 ### iv. Merge **Per Capita GHG 2022** and **Population 2022** datasets based on the country code
 
 ```{r}
+#| label: process-dataset-iv
+
 ghg_2022 <-
   left_join(per_capita_ghg_cleaned_2022, population_cleaned_2022, by = "code") |>
   select(country, code, per_capita_ghg_emissions_t, population)
 
-print(ghg_2022)
+ghg_2022
 ```
 
 ### v. Merge the **GHG 2022** and **Projected GHG 2030** datasets based on the country code
 
 ```{r}
+#| label: process-dataset-v
+
 ghg_2022_projected_2030 <- left_join(ghg_2022, analysis_ghg_projected_2030, by = c("code" = "region"))
 ghg_2022_projected_2030 <-
   mutate(ghg_2022_projected_2030, country = case_when(
@@ -215,7 +226,7 @@ ghg_2022_projected_2030 <-
   mutate(pc_projected_ghg_emissions_t = projected_ghg_emissions_t / population) |>
   select(country, code, per_capita_ghg_emissions_t, population, pc_projected_ghg_emissions_t)
 
-print(ghg_2022_projected_2030)
+ghg_2022_projected_2030
 ```
 
 # 3. Visualization
@@ -231,7 +242,7 @@ print(ghg_2022_projected_2030)
 -   Used world map to show the data
 -   Used label to show the ranking of the countries
 -   Used color palette to show the intensity of the data
--   Used Equal Earth Projection (ESRI:54035) to accurately preserve the relative sizes of areas on the Earth’s surface
+-   Used Behrmann Projection (ESRI:54017) to accurately preserve the relative sizes of areas on the Earth’s surface
 
 > **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
 
@@ -260,8 +271,12 @@ npts(world)
 ```
 
 ```{r}
+# Define map projection
+map_projection <- "ESRI:54017"
+
 # Merge emissions data with world map
 world <- left_join(world, ghg_2022_projected_2030, by = c("name" = "country"))
+world <- st_transform(world, map_projection)
 
 # Sort world data by per capita emissions
 world_pc <- world %>%
@@ -304,58 +319,41 @@ first_data_point <- top_10[1,]
 ```
 
 ```{r}
-first_data_point
-```
+#| fig.height: 20
+#| fig.width: 20
 
-```{r}
-#| fig.height: 15
-#| fig.width: 15
-
-# Set colour pallete
-#ylOrRd <- c("#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026") # Can remove this if you want to. Or even put the bubble_color HEXA values directly into the parameter
+# Set colour palette, last of YlOrRd
 bubble_color <- "#800026"
 
 # Set seed to reproduce same settings
 set.seed(1234567890)
 
+# Define earth polygon
+earth <- st_polygon(
+  x = list(
+    cbind(
+      c(rep(-180, 181), rep(180, 181), -180), c(-90:90, 90:-90, -90)
+    )
+  )
+) %>%
+st_sfc() %>%
+st_set_crs(4326) %>%
+st_as_sf()
+
 # Create choropleth map
 main_map <- ggplot(data = world_simplified) +
-  coord_sf(crs = "ESRI:54035") +
-  annotate(
-    "rect", 
-    xmin = -180, xmax = 180, ymin = -90, ymax = 90, 
-    fill = "lightblue",  
-    color = NA
-  ) +
+  geom_sf(data = earth, fill = "lightblue") +
   geom_sf(
     aes(fill = per_capita_ghg_emissions_t), 
     color = "black", 
     size = 0.2
-  ) +
-  scale_fill_fermenter(
-    breaks = pretty_breaks(n=8), # for 0t to 80t emissions
-    palette = "YlOrRd",
-    direction = 1
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major = element_blank(), 
-    panel.grid.minor = element_blank(),
-    legend.frame = element_rect(),
-    legend.position = "bottom",
-    legend.key.width = unit(0.6, "cm"), # Increase the width of the legend key
-    legend.key.height = unit(0.5, "cm"), # Increase the height of the legend key
-    text = element_text(size = 12),
-    plot.title = element_markdown(),
-    plot.subtitle = element_markdown()
   ) +
   geom_label_repel(
     data = top_10,
     aes(
       x = x + offset_x,
       y = y + offset_y,
-      label = sprintf("%d. %s", ranking, code),
-      fontface = "bold"
+      label = sprintf("%d. %s", ranking, code)
     ),
     size = 3,
     box.padding = 0.7,
@@ -363,101 +361,121 @@ main_map <- ggplot(data = world_simplified) +
     max.overlaps = Inf,
     seed = 1234567890,
     fill = scales::alpha("white", 0.65),
-    label.size = 0.1
+    label.size = 0.1,
+    fontface = "bold"
   ) +
   geom_point(
-    data = top_10,
+    data = filter(top_10, !is.na(pc_projected_ghg_emissions_t)),
     aes(
       x = x,
       y = y,
       size = pc_projected_ghg_emissions_t
     ),
     color = bubble_color,
-    alpha = 0.4
+    alpha = 0.5
   ) +
-  scale_size(range = c(2.5, 10), name = "Projected Reduce (%)") +
+  scale_fill_fermenter(
+    breaks = pretty_breaks(n = 8), 
+    palette = "YlOrRd",
+    direction = 1,
+    name = "Per Capita GHG Emissions (t)"
+  ) +
+  scale_size(
+    range = c(2.8, 10),
+    name = "Projected Reduction (%)"
+  ) +
   guides(
     fill = guide_colorbar(
-      title.position = "top",  
-      title.hjust = 0.5,  
-      label.position = "bottom" 
+      title.position = "top",
+      title.hjust = 0.5,
+      label.position = "bottom"
+    ),
+    size = guide_legend(
+      title.position = "top",
+      title.hjust = 0.5,
+      label.position = "bottom"
     )
   ) +
   labs(
-    title = "<b>Per Capita Greenhouse Gas Emissions in 2022</b>", 
+    title = "<b>2022 Per Capita GHG Emissions and 2030 Projected Reduction</b>", 
     subtitle = "<b>Top 10 Emitters in tonnes (t)</b>",
     caption = "Source: Our World in Data",
-    fill = "Per Capita GHG Emissions (t)",
     x = NULL,
     y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    legend.frame = element_rect(),
+    legend.text = element_text(size = 8.5),
+    legend.title = element_text(size = 10),
+    legend.position = "bottom",
+    legend.key.width = unit(0.6, "cm"),
+    legend.key.height = unit(0.6, "cm"),
+    text = element_text(size = 12),
+    plot.title = element_markdown(),
+    plot.subtitle = element_markdown()
   )
 ```
 
 ```{r}
-zoom_factor <- 5  # Adjust the zoom factor as needed
-first_data_point <- top_10[1,]  # Assuming top_10 contains data for top 10 emitters
+# Define the zoom factor and the first data point
+zoom_factor <- 5
+first_data_point <- top_10[1,]
 zoom_to <- c(first_data_point$x, first_data_point$y)
-lon_span <- 360 / 2^zoom_factor
-lat_span <- 180 / 2^zoom_factor
-lon_bounds <- c(zoom_to[1] - lon_span / 2, zoom_to[1] + lon_span / 2)
-lat_bounds <- c(zoom_to[2] - lat_span / 2, zoom_to[2] + lat_span / 2)
 
-# Calculate zoom range around the top 1 emitter
-#xmin <- first_data_point$x - zoom_factor
-#xmax <- first_data_point$x + zoom_factor
-#ymin <- first_data_point$y - zoom_factor
-#ymax <- first_data_point$y + zoom_factor - 55
+# Calculate the spans in the Behrmann projection
+C <- 40075016.686  # Circumference of the Earth in meters
+x_span <- C / 2^zoom_factor
+y_span <- C / 2^(zoom_factor + 1)
 
-# Filter the data for the mini-map around the top 1 emitter
-# mini_map_data <- st_crop(world_simplified, xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax)
+# Calculate bounds in the Behrmann projection
+x_bounds <- c(zoom_to[1] - x_span / 2, zoom_to[1] + x_span / 2)
+y_bounds <- c(zoom_to[2] - y_span / 2, zoom_to[2] + y_span / 2)
 
-  # Create the mini-map
-  mini_map <- ggplot() +
-    annotate(
-      "rect", 
-      xmin = -180, xmax = 180, ymin = -90, ymax = 90, 
-      fill = "lightblue",  
-      color = NA
-    ) +
-    geom_sf(data = st_sfc(st_point(zoom_to), crs = 4326), size = 1) +
-  
-    geom_sf(data = world_simplified, aes(fill = per_capita_ghg_emissions_t), 
-            color = "black", 
-            size = 0.2) +
-    coord_sf(xlim = lon_bounds, ylim = lat_bounds) +
-    scale_fill_fermenter(
-      breaks = pretty_breaks(n=9),
-      palette = "YlOrRd",
-      direction = 1) +
-    theme_void() +
-    theme(
-      text = element_text(size = 5),
-      panel.border = element_rect(color = "black", fill = NA, size = 1),
-      plot.title = element_markdown(),
-      plot.subtitle = element_markdown(),
-      axis.text = element_blank(),  # Remove axis text
-      axis.title = element_blank()  # Optionally remove axis titles
-    ) +
-    geom_sf_text(
-      data = filter(world_simplified, ranking == 1),
-      aes(label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)),
-      size = 3,
-      fontface = "bold",
-      fill = scales::alpha("white", 0.65),
-      label.padding = unit(0.2, "lines"),
-      label.size = NA,  # Remove the label border
-      nudge_x = -0.5,  # Adjust label position
-      nudge_y = 1.5) +
-    
-    guides(
-      fill = FALSE  # Remove the legend for fill color
-    )
+# Create the mini-map
+mini_map <- ggplot() +
+  geom_sf(data = earth, fill = "lightblue") +
+  geom_sf(data = world_simplified, aes(fill = per_capita_ghg_emissions_t), 
+          color = "black", 
+          size = 0.2) +
+  coord_sf(xlim = x_bounds, ylim = y_bounds, crs = map_projection) +
+  geom_label(
+    data = data.frame(
+      x = zoom_to[1] - 0.095 * 100000,  # Adjust the offset to meters
+      y = zoom_to[2] + 2.000 * 100000,
+      label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)
+    ),
+    aes(x = x, y = y, label = label),
+    size = 2.5,
+    fill = scales::alpha("white", 0.65),
+    label.size = 0.1,
+    fontface = "bold"
+  ) +
+  scale_fill_fermenter(
+    breaks = pretty_breaks(n = 9),
+    palette = "YlOrRd",
+    direction = 1
+  ) +
+  theme_void() +
+  theme(
+    text = element_text(size = 5),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+    plot.title = element_markdown(),
+    plot.subtitle = element_markdown(),
+    axis.text = element_blank(),
+    axis.title = element_blank()
+  ) +
+  guides(
+    fill = "none"
+  )
 
 # Combine the main map and the mini-map using cowplot
-
 combined_plot <- cowplot::ggdraw(main_map) +
-  cowplot::draw_plot(mini_map, x = 0.746, y = 0.255, width = 0.17, height = 0.17)
+  cowplot::draw_plot(mini_map, x = 0.795, y = 0.315, width = 0.17, height = 0.090)
 
 # Display the combined plot
 combined_plot
 ```
+
