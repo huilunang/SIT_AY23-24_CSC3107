@@ -98,7 +98,7 @@ library(tidyverse)
 #| label: dataset-part-e-iii-3
 
 pc_ghg <-
-  read.csv("per_capita_ghg_dataset.csv") |>
+  read.csv("dataset/per_capita_ghg_dataset.csv") |>
   as_tibble()
 
 pc_ghg
@@ -110,7 +110,7 @@ pc_ghg
 #| label: dataset-part-e-ii-2
 
 analysis_ghg <-
-  read.csv("ghg_emission_analysis_dataset.csv") |>
+  read.csv("dataset/ghg_emission_analysis_dataset.csv") |>
   as_tibble()
 
 analysis_ghg
@@ -122,7 +122,7 @@ analysis_ghg
 #| label: dataset-part-e-v-1
 
 population <-
-  read.csv("total_population_1960_2022.csv", skip = 4) |>
+  read.csv("dataset/total_population_1960_2022.csv", skip = 4) |>
   as_tibble()
 
 population
