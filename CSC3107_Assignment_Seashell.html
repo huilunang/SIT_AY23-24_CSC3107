@@ -134,13 +134,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>More numerical figures and labels could be used with the bubble chart and graphs to convey the content more effectively at a glance.</li>
 <li>A historical chart of the top countries contribution to climate impact can be shown thus identifying the actions taken by them to reduce global emissions.</li>
 <li>Provide a legend for the bubble chart to show the size of the bubble represents the amount of emissions.</li>
-<li>(Feedback)</li>
-</ol>
+<li>Feedback (Class Discussion)
 <ul>
 <li>Use world map to represent the data</li>
 <li>Highlight top 10 (label countries)</li>
-<li>Show 2 world maps to show current emission, and the other to show countries who should reduce emission in GHG</li>
-</ul>
+<li>Show 2 world maps:
+<ul>
+<li>One to show current emissions</li>
+<li>One to show countries that should reduce GHG emissions</li>
+</ul></li>
+</ul></li>
+</ol>
 </section>
 <section id="e.-publicly-available-data" class="level2">
 <h2 class="anchored" data-anchor-id="e.-publicly-available-data">e. Publicly Available Data</h2>
@@ -177,6 +181,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><a href="https://data.worldbank.org/indicator/SP.POP.TOTL?end=2022&amp;start=2022&amp;view=bar">Population Data</a></li>
 </ol>
 </section>
+</section>
+<section id="f.-finalised-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="f.-finalised-dataset">f.&nbsp;Finalised Dataset</h2>
+<p><strong>1. pc_ghg</strong></p>
+<ul>
+<li><strong>Source</strong>: Our World in Data</li>
+<li><strong>Columns</strong>: <code>country</code>, <code>pc_ghg_emissions_t</code></li>
+<li><strong>Description</strong>: 2022 Per capita greenhouse gas emissions for various countries.</li>
+</ul>
+<p><strong>2. analysis_ghg</strong></p>
+<ul>
+<li><strong>Source</strong>: Climate Action Tracker</li>
+<li><strong>Columns</strong>: <code>region</code>, <code>value</code></li>
+<li><strong>Description</strong>: Projected greenhouse gas emissions by 2030 based on the “fair share range” rating system, derived from scientific literature considering various definitions (responsibility, capability/need, equality, cumulative per capita emissions, staged approaches) to assess each country’s fair contribution to the Paris Agreement, supplemented by our own analysis to close data gaps.</li>
+</ul>
+<p><strong>3. population</strong></p>
+<ul>
+<li><strong>Source</strong>: The World Bank</li>
+<li><strong>Columns</strong>: <code>Country.Name</code>, <code>Country.Code</code>, <code>X2022</code></li>
+<li><strong>Description</strong>: Total population data from 1960 to 2022 is used to calculate the projected per capita greenhouse gas reduction by 2030.</li>
+</ul>
+<p><strong>4. world</strong></p>
+<ul>
+<li><strong>Source</strong>: Natural Earth</li>
+<li><strong>Columns</strong>: <code>name</code>, <code>code</code>, <code>geometry</code></li>
+<li><strong>Description</strong>: Geospatial data for country boundaries.</li>
+</ul>
 </section>
 </section>
 <section id="data-collection-and-preprocessing" class="level1">
@@ -434,27 +465,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>3. Visualization</h1>
 <section id="a.-world-emission-chart-using-world-map" class="level2">
 <h2 class="anchored" data-anchor-id="a.-world-emission-chart-using-world-map">a. World Emission Chart using World Map</h2>
-<section id="previous-chart" class="level4">
-<h4 class="anchored" data-anchor-id="previous-chart">Previous Chart</h4>
+<section id="i.-previous-chart" class="level3">
+<h3 class="anchored" data-anchor-id="i.-previous-chart">i. Previous Chart</h3>
 <ul>
 <li>Bubble chart by size to show the ranking of the countries <img src="original_chart/total_ghg_emissions_bbchart.png" class="img-fluid" alt="Original Total Greenhouse Gas Emissions"></li>
 </ul>
 </section>
-<section id="improved-elements" class="level4">
-<h4 class="anchored" data-anchor-id="improved-elements">Improved Elements</h4>
+<section id="ii.-improved-elements" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-improved-elements">ii. Improved Elements</h3>
 <ul>
-<li>Used world map to show the data</li>
-<li>Used label to show the ranking of the countries</li>
-<li>Used color palette to show the intensity of the data</li>
-<li>Used Behrmann Projection (ESRI:54017) to accurately preserve the relative sizes of areas on the Earth’s surface</li>
+<li>Used a world map with bubble plots to show the data of top per capita GHG emitters and projected reductions.</li>
+<li>Used labels to show the ranking of the countries.</li>
+<li>Applied a color palette to indicate the intensity of the data.</li>
+<li>Used the Behrmann Projection (ESRI:54017) to accurately preserve the relative sizes of areas on the Earth’s surface.</li>
 </ul>
 <blockquote class="blockquote">
 <p><strong>Note</strong>: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.</p>
 </blockquote>
+</section>
+<section id="iii.-insights" class="level3">
+<h3 class="anchored" data-anchor-id="iii.-insights">iii. Insights</h3>
+<ul>
+<li>The data is skewed towards 70 tonnes due to an outlier, Qatar, as indicated in the minimap. The remaining nine countries fall within the range of 20 to 40 tonnes.</li>
+</ul>
+<hr>
 <p>Ensure that the data obtained from open source is clean and free of any invalidity and inefficiencies by checking:</p>
 <ul>
-<li><p>Spatial type validity</p></li>
-<li><p>Number of geospatial data points is &lt; 10,000</p></li>
+<li>Spatial type validity</li>
+<li>Number of geospatial data points is &lt; 10,000</li>
 </ul>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
