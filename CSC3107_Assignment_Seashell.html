@@ -134,13 +134,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>More numerical figures and labels could be used with the bubble chart and graphs to convey the content more effectively at a glance.</li>
 <li>A historical chart of the top countries contribution to climate impact can be shown thus identifying the actions taken by them to reduce global emissions.</li>
 <li>Provide a legend for the bubble chart to show the size of the bubble represents the amount of emissions.</li>
-<li>(Feedback)</li>
-</ol>
+<li>Feedback (Class Discussion)
 <ul>
 <li>Use world map to represent the data</li>
 <li>Highlight top 10 (label countries)</li>
-<li>Show 2 world maps to show current emission, and the other to show countries who should reduce emission in GHG</li>
-</ul>
+<li>Show 2 world maps:
+<ul>
+<li>One to show current emissions</li>
+<li>One to show countries that should reduce GHG emissions</li>
+</ul></li>
+</ul></li>
+</ol>
 </section>
 <section id="e.-publicly-available-data" class="level2">
 <h2 class="anchored" data-anchor-id="e.-publicly-available-data">e. Publicly Available Data</h2>
@@ -178,22 +182,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 </section>
 </section>
+<section id="f.-finalised-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="f.-finalised-dataset">f.&nbsp;Finalised Dataset</h2>
+<p><strong>1. pc_ghg</strong></p>
+<ul>
+<li><strong>Source</strong>: Our World in Data</li>
+<li><strong>Columns</strong>: <code>country</code>, <code>pc_ghg_emissions_t</code></li>
+<li><strong>Description</strong>: 2022 Per capita greenhouse gas emissions for various countries.</li>
+</ul>
+<p><strong>2. analysis_ghg</strong></p>
+<ul>
+<li><strong>Source</strong>: Climate Action Tracker</li>
+<li><strong>Columns</strong>: <code>region</code>, <code>value</code></li>
+<li><strong>Description</strong>: Projected greenhouse gas emissions by 2030 based on the “fair share range” rating system, derived from scientific literature considering various definitions (responsibility, capability/need, equality, cumulative per capita emissions, staged approaches) to assess each country’s fair contribution to the Paris Agreement, supplemented by our own analysis to close data gaps.</li>
+</ul>
+<p><strong>3. population</strong></p>
+<ul>
+<li><strong>Source</strong>: The World Bank</li>
+<li><strong>Columns</strong>: <code>Country.Name</code>, <code>Country.Code</code>, <code>X2022</code></li>
+<li><strong>Description</strong>: Total population data from 1960 to 2022 is used to calculate the projected per capita greenhouse gas reduction by 2030.</li>
+</ul>
+<p><strong>4. world</strong></p>
+<ul>
+<li><strong>Source</strong>: Natural Earth</li>
+<li><strong>Columns</strong>: <code>name</code>, <code>code</code>, <code>geometry</code></li>
+<li><strong>Description</strong>: Geospatial data for country boundaries.</li>
+</ul>
+</section>
 </section>
 <section id="data-collection-and-preprocessing" class="level1">
 <h1>2. Data Collection and Preprocessing</h1>
 <section id="a.-import-packages" class="level2">
 <h2 class="anchored" data-anchor-id="a.-import-packages">a. Import packages</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggtext)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmltools)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmapshaper)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmapshaper)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="b.-view-data" class="level2">
@@ -276,18 +307,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 35,611 × 4
-   country     code   year per_capita_ghg_emissions_t
-   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                      &lt;dbl&gt;
- 1 Afghanistan AFG    1850                       1.96
- 2 Afghanistan AFG    1851                       1.96
- 3 Afghanistan AFG    1852                       1.97
- 4 Afghanistan AFG    1853                       1.98
- 5 Afghanistan AFG    1854                       1.99
- 6 Afghanistan AFG    1855                       1.99
- 7 Afghanistan AFG    1856                       2.00
- 8 Afghanistan AFG    1857                       2.00
- 9 Afghanistan AFG    1858                       2.01
-10 Afghanistan AFG    1859                       2.01
+   country     code   year pc_ghg_emissions_t
+   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;              &lt;dbl&gt;
+ 1 Afghanistan AFG    1850               1.96
+ 2 Afghanistan AFG    1851               1.96
+ 3 Afghanistan AFG    1852               1.97
+ 4 Afghanistan AFG    1853               1.98
+ 5 Afghanistan AFG    1854               1.99
+ 6 Afghanistan AFG    1855               1.99
+ 7 Afghanistan AFG    1856               2.00
+ 8 Afghanistan AFG    1857               2.00
+ 9 Afghanistan AFG    1858               2.01
+10 Afghanistan AFG    1859               2.01
 # ℹ 35,601 more rows</code></pre>
 </div>
 </div>
@@ -327,18 +358,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 208 × 4
-   country             code   year per_capita_ghg_emissions_t
-   &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;                      &lt;dbl&gt;
- 1 Afghanistan         "AFG"  2022                      0.890
- 2 Africa              ""     2022                      3.33 
- 3 Albania             "ALB"  2022                      2.83 
- 4 Algeria             "DZA"  2022                      6.28 
- 5 Andorra             "AND"  2022                      6.04 
- 6 Angola              "AGO"  2022                      5.12 
- 7 Antigua and Barbuda "ATG"  2022                      7.28 
- 8 Argentina           "ARG"  2022                      8.53 
- 9 Armenia             "ARM"  2022                      3.47 
-10 Asia                ""     2022                      6.37 
+   country             code   year pc_ghg_emissions_t
+   &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;              &lt;dbl&gt;
+ 1 Afghanistan         "AFG"  2022              0.890
+ 2 Africa              ""     2022              3.33 
+ 3 Albania             "ALB"  2022              2.83 
+ 4 Algeria             "DZA"  2022              6.28 
+ 5 Andorra             "AND"  2022              6.04 
+ 6 Angola              "AGO"  2022              5.12 
+ 7 Antigua and Barbuda "ATG"  2022              7.28 
+ 8 Argentina           "ARG"  2022              8.53 
+ 9 Armenia             "ARM"  2022              3.47 
+10 Asia                ""     2022              6.37 
 # ℹ 198 more rows</code></pre>
 </div>
 </div>
@@ -390,18 +421,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 208 × 4
-   country             code  per_capita_ghg_emissions_t population
-   &lt;chr&gt;               &lt;chr&gt;                      &lt;dbl&gt;      &lt;dbl&gt;
- 1 Afghanistan         "AFG"                      0.890   41128771
- 2 Africa              ""                         3.33          NA
- 3 Albania             "ALB"                      2.83     2777689
- 4 Algeria             "DZA"                      6.28    44903225
- 5 Andorra             "AND"                      6.04       79824
- 6 Angola              "AGO"                      5.12    35588987
- 7 Antigua and Barbuda "ATG"                      7.28       93763
- 8 Argentina           "ARG"                      8.53    46234830
- 9 Armenia             "ARM"                      3.47     2780469
-10 Asia                ""                         6.37          NA
+   country             code  pc_ghg_emissions_t population
+   &lt;chr&gt;               &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;
+ 1 Afghanistan         "AFG"              0.890   41128771
+ 2 Africa              ""                 3.33          NA
+ 3 Albania             "ALB"              2.83     2777689
+ 4 Algeria             "DZA"              6.28    44903225
+ 5 Andorra             "AND"              6.04       79824
+ 6 Angola              "AGO"              5.12    35588987
+ 7 Antigua and Barbuda "ATG"              7.28       93763
+ 8 Argentina           "ARG"              8.53    46234830
+ 9 Armenia             "ARM"              3.47     2780469
+10 Asia                ""                 6.37          NA
 # ℹ 198 more rows</code></pre>
 </div>
 </div>
@@ -411,21 +442,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 208 × 5
-   country        code  per_capita_ghg_emiss…¹ population pc_projected_ghg_emi…²
-   &lt;chr&gt;          &lt;chr&gt;                  &lt;dbl&gt;      &lt;dbl&gt;                  &lt;dbl&gt;
- 1 Afghanistan    "AFG"                  0.890   41128771                  NA   
- 2 Africa         ""                     3.33          NA                  NA   
- 3 Albania        "ALB"                  2.83     2777689                  NA   
- 4 Algeria        "DZA"                  6.28    44903225                  NA   
- 5 Andorra        "AND"                  6.04       79824                  NA   
- 6 Angola         "AGO"                  5.12    35588987                  NA   
- 7 Antigua and B… "ATG"                  7.28       93763                  NA   
- 8 Argentina      "ARG"                  8.53    46234830                   4.14
- 9 Armenia        "ARM"                  3.47     2780469                  NA   
-10 Asia           ""                     6.37          NA                  NA   
+   country            code  pc_ghg_emissions_t population pc_projected_ghg_emi…¹
+   &lt;chr&gt;              &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 Afghanistan        "AFG"              0.890   41128771                  NA   
+ 2 Africa             ""                 3.33          NA                  NA   
+ 3 Albania            "ALB"              2.83     2777689                  NA   
+ 4 Algeria            "DZA"              6.28    44903225                  NA   
+ 5 Andorra            "AND"              6.04       79824                  NA   
+ 6 Angola             "AGO"              5.12    35588987                  NA   
+ 7 Antigua and Barbu… "ATG"              7.28       93763                  NA   
+ 8 Argentina          "ARG"              8.53    46234830                   4.14
+ 9 Armenia            "ARM"              3.47     2780469                  NA   
+10 Asia               ""                 6.37          NA                  NA   
 # ℹ 198 more rows
-# ℹ abbreviated names: ¹​per_capita_ghg_emissions_t,
-#   ²​pc_projected_ghg_emissions_t</code></pre>
+# ℹ abbreviated name: ¹​pc_projected_ghg_emissions_t</code></pre>
 </div>
 </div>
 </section>
@@ -435,51 +465,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>3. Visualization</h1>
 <section id="a.-world-emission-chart-using-world-map" class="level2">
 <h2 class="anchored" data-anchor-id="a.-world-emission-chart-using-world-map">a. World Emission Chart using World Map</h2>
-<section id="previous-chart" class="level4">
-<h4 class="anchored" data-anchor-id="previous-chart">Previous Chart</h4>
+<section id="i.-previous-chart" class="level3">
+<h3 class="anchored" data-anchor-id="i.-previous-chart">i. Previous Chart</h3>
 <ul>
 <li>Bubble chart by size to show the ranking of the countries <img src="original_chart/total_ghg_emissions_bbchart.png" class="img-fluid" alt="Original Total Greenhouse Gas Emissions"></li>
 </ul>
 </section>
-<section id="improved-elements" class="level4">
-<h4 class="anchored" data-anchor-id="improved-elements">Improved Elements</h4>
+<section id="ii.-improved-elements" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-improved-elements">ii. Improved Elements</h3>
 <ul>
-<li>Used world map to show the data</li>
-<li>Used label to show the ranking of the countries</li>
-<li>Used color palette to show the intensity of the data</li>
+<li>Used a world map with bubble plots to show the data of top per capita GHG emitters and projected reductions.</li>
+<li>Used labels to show the ranking of the countries.</li>
+<li>Applied a color palette to indicate the intensity of the data.</li>
+<li>Used the Behrmann Projection (ESRI:54017) to accurately preserve the relative sizes of areas on the Earth’s surface.</li>
 </ul>
 <blockquote class="blockquote">
 <p><strong>Note</strong>: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.</p>
 </blockquote>
+</section>
+<section id="iii.-insights" class="level3">
+<h3 class="anchored" data-anchor-id="iii.-insights">iii. Insights</h3>
+<ul>
+<li>The data is skewed towards 70 tonnes due to an outlier, Qatar, as indicated in the minimap. The remaining nine countries fall within the range of 20 to 40 tonnes.</li>
+</ul>
+<hr>
 <p>Ensure that the data obtained from open source is clean and free of any invalidity and inefficiencies by checking:</p>
 <ul>
-<li><p>Spatial type validity</p></li>
-<li><p>Number of geospatial data points is &lt; 10,000</p></li>
+<li>Spatial type validity</li>
+<li>Number of geospatial data points is &lt; 10,000</li>
 </ul>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Reducing features on `world` for faster rendering from 99613"</code></pre>
+<pre><code>[1] "Reducing features in `world` for faster rendering from 99613"</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 6296</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 2 rows containing missing values or values outside the scale range
-(`geom_label_repel()`).</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 6 rows containing missing values or values outside the scale range
-(`geom_point()`).</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="CSC3107_Assignment_Seashell_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="864"></p>
+<p><img src="CSC3107_Assignment_Seashell_files/figure-html/combine-plot-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
