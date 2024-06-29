@@ -78,17 +78,16 @@ The news article aims to convey the impacts if the current situation remains unc
 #| message: false
 #| warning: false
 
+library(cowplot)
 library(ggplot2)
-library(ggrepel)
 library(ggtext)
-library(htmltools)
-library(rnaturalearth)
-library(sf)
-library(tidyverse)
-library(scales)
+library(ggrepel)
 library(mapview)
 library(rmapshaper)
-library(cowplot)
+library(rnaturalearth)
+library(sf)
+library(scales)
+library(tidyverse)
 ```
 
 ## b. View Data
@@ -98,13 +97,11 @@ library(cowplot)
 ```{r}
 #| label: dataset-part-e-iii-3
 
-# Read the CSV file
-per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
+pc_ghg <-
+  read.csv("per_capita_ghg_dataset.csv") |>
+  as_tibble()
 
-# Convert to tibble
-per_capita_ghg <- as_tibble(per_capita_ghg)
-
-print(per_capita_ghg)
+pc_ghg
 ```
 
 ### ii. Reading of **Total Greenhouse Gas Emission Analysis Dataset**
@@ -112,11 +109,11 @@ print(per_capita_ghg)
 ```{r}
 #| label: dataset-part-e-ii-2
 
-analysis_ghg <- read.csv("ghg_emission_analysis_dataset.csv")
+analysis_ghg <-
+  read.csv("ghg_emission_analysis_dataset.csv") |>
+  as_tibble()
 
-analysis_ghg <- as_tibble(analysis_ghg)
-
-print(analysis_ghg)
+analysis_ghg
 ```
 
 ### iii. Reading of **Population From 1960 - 2022 Dataset**
@@ -124,11 +121,11 @@ print(analysis_ghg)
 ```{r}
 #| label: dataset-part-e-v-1
 
-population <- read.csv("total_population_1960_2022.csv", skip=4)
+population <-
+  read.csv("total_population_1960_2022.csv", skip = 4) |>
+  as_tibble()
 
-population <- as_tibble(population)
-
-print(population)
+population
 ```
 
 ## c. Clean
@@ -138,15 +135,15 @@ print(population)
 ```{r}
 #| label: clean-dataset-i
 
-# Rename the per capita emissions column
-colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Entity"] <- "country"
-colnames(per_capita_ghg)[colnames(per_capita_ghg) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "per_capita_ghg_emissions_t"
-colnames(per_capita_ghg) <- tolower(colnames(per_capita_ghg))
+# Rename columns
+colnames(pc_ghg)[colnames(pc_ghg) == "Entity"] <- "country"
+colnames(pc_ghg)[colnames(pc_ghg) == "Per.capita.greenhouse.gas.emissions.in.CO..equivalents"] <- "pc_ghg_emissions_t"
+colnames(pc_ghg) <- tolower(colnames(pc_ghg))
 
-# Remove NAs from per capita emissions column
-per_capita_ghg_cleaned <- drop_na(per_capita_ghg, per_capita_ghg_emissions_t)
+# Remove NAs from emissions column
+pc_ghg_cleaned <- drop_na(pc_ghg, pc_ghg_emissions_t)
 
-per_capita_ghg_cleaned
+pc_ghg_cleaned
 ```
 
 ### ii. Rename column from **Total Population Dataset**
@@ -168,10 +165,13 @@ print(population)
 ```{r}
 #| label: process-dataset-i
 
-per_capita_ghg_cleaned_2022 <- filter(per_capita_ghg_cleaned, year == 2022)
-per_capita_ghg_cleaned_2022 <- mutate(per_capita_ghg_cleaned_2022, code = if_else(country == "European Union (27)", "EU27", code))
+pc_ghg_cleaned_2022 <-
+  filter(pc_ghg_cleaned, year == 2022) |>
+  mutate(
+    code = if_else(country == "European Union (27)", "EU27", code)
+  )
 
-print(per_capita_ghg_cleaned_2022)
+pc_ghg_cleaned_2022
 ```
 
 ### ii. Filter projected reduction emission by 2030 to keep global temperature rise below 1.5°C from **Greenhouse Gas Emission Analysis Dataset**
@@ -179,11 +179,15 @@ print(per_capita_ghg_cleaned_2022)
 ```{r}
 #| label: process-dataset-ii
 
-analysis_ghg_projected_2030 <- filter(analysis_ghg, grepl("1.5", scenario), indicator == "Equity boundaries (absolute)", year == 2030)
-
-analysis_ghg_projected_2030 <- analysis_ghg_projected_2030 %>%
-  select(region, value) %>%
-  mutate(value = value * 1000000) %>%
+analysis_ghg_projected_2030 <-
+  filter(
+    analysis_ghg,
+    grepl("1.5", scenario),
+    indicator == "Equity boundaries (absolute)",
+    year == 2030
+  ) |>
+  select(region, value) |>
+  mutate(value = value * 1000000) |>
   rename(projected_ghg_emissions_t = value)
 
 analysis_ghg_projected_2030
@@ -194,8 +198,7 @@ analysis_ghg_projected_2030
 ```{r}
 #| label: process-dataset-iii
 
-population_cleaned_2022 <- population %>%
-  select(code, population)
+population_cleaned_2022 <- select(.data = population, code, population)
 
 population_cleaned_2022
 ```
@@ -206,8 +209,8 @@ population_cleaned_2022
 #| label: process-dataset-iv
 
 ghg_2022 <-
-  left_join(per_capita_ghg_cleaned_2022, population_cleaned_2022, by = "code") |>
-  select(country, code, per_capita_ghg_emissions_t, population)
+  left_join(pc_ghg_cleaned_2022, population_cleaned_2022, by = "code") |>
+  select(country, code, pc_ghg_emissions_t, population)
 
 ghg_2022
 ```
@@ -217,14 +220,13 @@ ghg_2022
 ```{r}
 #| label: process-dataset-v
 
-ghg_2022_projected_2030 <- left_join(ghg_2022, analysis_ghg_projected_2030, by = c("code" = "region"))
-ghg_2022_projected_2030 <-
-  mutate(ghg_2022_projected_2030, country = case_when(
-    country == "United States" ~ "United States of America",
-    TRUE ~ country
-  )) |>
-  mutate(pc_projected_ghg_emissions_t = projected_ghg_emissions_t / population) |>
-  select(country, code, per_capita_ghg_emissions_t, population, pc_projected_ghg_emissions_t)
+ghg_2022_projected_2030 <- ghg_2022 |>
+  left_join(analysis_ghg_projected_2030, by = c("code" = "region")) |>
+  mutate(
+    country = ifelse(country == "United States", "United States of America", country),
+    pc_projected_ghg_emissions_t = projected_ghg_emissions_t / population
+  ) |>
+  select(country, code, pc_ghg_emissions_t, population, pc_projected_ghg_emissions_t)
 
 ghg_2022_projected_2030
 ```
@@ -253,74 +255,76 @@ Ensure that the data obtained from open source is clean and free of any invalidi
 -   Number of geospatial data points is \< 10,000
 
 ```{r}
+#| label: load-world-map
+
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
-# Check if the points in `world` are non-intersectting
+# Check if the polygons in `world` are valid
 all(st_is_valid(world))
 
-# Check number of st features obtained from open source data
-# Recommended to generally have 10,000 < geospatial data points
-if(npts(world) >= 10000)
-{
-  print(sprintf("Reducing features on `world` for faster rendering from %d", npts(world)))
+# Check the number of spatial features obtained from open source data
+# Recommended to generally have fewer than 10,000 geospatial data points
+if (npts(world) >= 10000) {
+  print(sprintf("Reducing features in `world` for faster rendering from %d", npts(world)))
   world <- ms_simplify(world)
 }
-# Check number of features in world data
+
+# Check the number of features in the world data
 npts(world)
 ```
 
 ```{r}
+#| label: preprocess-world-map
+
 # Define map projection
 map_projection <- "ESRI:54017"
 
-# Merge emissions data with world map
-world <- left_join(world, ghg_2022_projected_2030, by = c("name" = "country"))
-world <- st_transform(world, map_projection)
+# Merge emissions data with world map and transform
+world <- world |>
+  left_join(ghg_2022_projected_2030, by = c("name" = "country")) |>
+  st_transform(map_projection)
 
-# Sort world data by per capita emissions
-world_pc <- world %>%
-  arrange(desc(per_capita_ghg_emissions_t)) %>%
-  mutate(ranking = row_number())
-
-# Create simplified dataframe
-world_simplified <- world_pc %>%
+# Sort and add ranking by per capita GHG emissions
+world_simplified <- world |>
+  arrange(desc(pc_ghg_emissions_t)) |>
+  mutate(ranking = row_number()) |>
   select(
-    ranking, 
+    ranking,
     name,
     code,
     geometry,
-    per_capita_ghg_emissions_t, 
+    pc_ghg_emissions_t,
     pc_projected_ghg_emissions_t
   )
-```
 
-```{r}
-# Top 10 Emitters
-top_10 <- subset(world_simplified, ranking <= 10)
-
-# Individual label offsets
+# Subset top 10 emitters and calculate label offsets
+top_10 <- head(world_simplified, 10)
 label_offsets <- data.frame(
   country = top_10$name,
-  offset_x = rep(0, nrow(top_10)),
-  offset_y = rep(0, nrow(top_10))
+  offset_x = 0,
+  offset_y = 0
 )
 
-# Merge offsets data
-world_simplified <- left_join(world_simplified, label_offsets, by = c("name" = "country"))
+# Merge offsets with simplified world data and calculate centroid coordinates
+world_simplified <-
+  left_join(world_simplified, label_offsets, by = c("name" = "country")) |>
+  mutate(
+    .data = world_simplified,
+    centroid = st_centroid(geometry),
+    x = st_coordinates(centroid)[, 1],
+    y = st_coordinates(centroid)[, 2]
+  )
 
-# Extract centroid coordinates to offset labels
-world_simplified <- world_simplified %>%
-  mutate(centroid = st_centroid(geometry),
-         x = st_coordinates(centroid)[,1],
-         y = st_coordinates(centroid)[,2])
+# Extract details for the first data point among top 10
 top_10 <- subset(world_simplified, ranking <= 10)
-first_data_point <- top_10[1,]
+first_data_point <- top_10[1, ]
 ```
 
 ```{r}
-#| fig.height: 20
-#| fig.width: 20
+#| label: plot-world-map
+#| fig.height: 15
+#| fig.width: 15
 
 # Set colour palette, last of YlOrRd
 bubble_color <- "#800026"
@@ -335,17 +339,17 @@ earth <- st_polygon(
       c(rep(-180, 181), rep(180, 181), -180), c(-90:90, 90:-90, -90)
     )
   )
-) %>%
-st_sfc() %>%
-st_set_crs(4326) %>%
-st_as_sf()
+) |>
+  st_sfc() |>
+  st_set_crs(4326) |>
+  st_as_sf()
 
 # Create choropleth map
 main_map <- ggplot(data = world_simplified) +
   geom_sf(data = earth, fill = "lightblue") +
   geom_sf(
-    aes(fill = per_capita_ghg_emissions_t), 
-    color = "black", 
+    aes(fill = pc_ghg_emissions_t),
+    color = "black",
     size = 0.2
   ) +
   geom_label_repel(
@@ -375,7 +379,7 @@ main_map <- ggplot(data = world_simplified) +
     alpha = 0.5
   ) +
   scale_fill_fermenter(
-    breaks = pretty_breaks(n = 8), 
+    breaks = pretty_breaks(n = 8),
     palette = "YlOrRd",
     direction = 1,
     name = "Per Capita GHG Emissions (t)"
@@ -397,7 +401,7 @@ main_map <- ggplot(data = world_simplified) +
     )
   ) +
   labs(
-    title = "<b>2022 Per Capita GHG Emissions and 2030 Projected Reduction</b>", 
+    title = "<b>2022 Per Capita GHG Emissions and 2030 Projected Reduction</b>",
     subtitle = "<b>Top 10 Emitters in tonnes (t)</b>",
     caption = "Source: Our World in Data",
     x = NULL,
@@ -405,7 +409,7 @@ main_map <- ggplot(data = world_simplified) +
   ) +
   theme_minimal() +
   theme(
-    panel.grid.major = element_blank(), 
+    panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     legend.frame = element_rect(),
     legend.text = element_text(size = 8.5),
@@ -420,13 +424,15 @@ main_map <- ggplot(data = world_simplified) +
 ```
 
 ```{r}
+#| label: plot-mini-map
+
 # Define the zoom factor and the first data point
 zoom_factor <- 5
-first_data_point <- top_10[1,]
+first_data_point <- top_10[1, ]
 zoom_to <- c(first_data_point$x, first_data_point$y)
 
 # Calculate the spans in the Behrmann projection
-C <- 40075016.686  # Circumference of the Earth in meters
+C <- 40075016.686 # Circumference of the Earth in meters
 x_span <- C / 2^zoom_factor
 y_span <- C / 2^(zoom_factor + 1)
 
@@ -437,13 +443,15 @@ y_bounds <- c(zoom_to[2] - y_span / 2, zoom_to[2] + y_span / 2)
 # Create the mini-map
 mini_map <- ggplot() +
   geom_sf(data = earth, fill = "lightblue") +
-  geom_sf(data = world_simplified, aes(fill = per_capita_ghg_emissions_t), 
-          color = "black", 
-          size = 0.2) +
+  geom_sf(
+    data = world_simplified, aes(fill = pc_ghg_emissions_t),
+    color = "black",
+    size = 0.2
+  ) +
   coord_sf(xlim = x_bounds, ylim = y_bounds, crs = map_projection) +
   geom_label(
     data = data.frame(
-      x = zoom_to[1] - 0.095 * 100000,  # Adjust the offset to meters
+      x = zoom_to[1] - 0.095 * 100000, # Adjust the offset to meters
       y = zoom_to[2] + 2.000 * 100000,
       label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)
     ),
@@ -470,12 +478,22 @@ mini_map <- ggplot() +
   guides(
     fill = "none"
   )
+```
+
+```{r}
+#| label: combine-plot
 
 # Combine the main map and the mini-map using cowplot
-combined_plot <- cowplot::ggdraw(main_map) +
-  cowplot::draw_plot(mini_map, x = 0.795, y = 0.315, width = 0.17, height = 0.090)
+combined_plot <-
+  cowplot::ggdraw(main_map) +
+  cowplot::draw_plot(
+    mini_map,
+    x = 0.795,
+    y = 0.315,
+    width = 0.17,
+    height = 0.090
+  )
 
 # Display the combined plot
 combined_plot
 ```
-

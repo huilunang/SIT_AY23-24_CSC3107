@@ -184,17 +184,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a.-import-packages" class="level2">
 <h2 class="anchored" data-anchor-id="a.-import-packages">a. Import packages</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggtext)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmltools)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmapshaper)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rmapshaper)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="b.-view-data" class="level2">
@@ -277,18 +276,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 35,611 × 4
-   country     code   year per_capita_ghg_emissions_t
-   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;                      &lt;dbl&gt;
- 1 Afghanistan AFG    1850                       1.96
- 2 Afghanistan AFG    1851                       1.96
- 3 Afghanistan AFG    1852                       1.97
- 4 Afghanistan AFG    1853                       1.98
- 5 Afghanistan AFG    1854                       1.99
- 6 Afghanistan AFG    1855                       1.99
- 7 Afghanistan AFG    1856                       2.00
- 8 Afghanistan AFG    1857                       2.00
- 9 Afghanistan AFG    1858                       2.01
-10 Afghanistan AFG    1859                       2.01
+   country     code   year pc_ghg_emissions_t
+   &lt;chr&gt;       &lt;chr&gt; &lt;int&gt;              &lt;dbl&gt;
+ 1 Afghanistan AFG    1850               1.96
+ 2 Afghanistan AFG    1851               1.96
+ 3 Afghanistan AFG    1852               1.97
+ 4 Afghanistan AFG    1853               1.98
+ 5 Afghanistan AFG    1854               1.99
+ 6 Afghanistan AFG    1855               1.99
+ 7 Afghanistan AFG    1856               2.00
+ 8 Afghanistan AFG    1857               2.00
+ 9 Afghanistan AFG    1858               2.01
+10 Afghanistan AFG    1859               2.01
 # ℹ 35,601 more rows</code></pre>
 </div>
 </div>
@@ -328,18 +327,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 208 × 4
-   country             code   year per_capita_ghg_emissions_t
-   &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;                      &lt;dbl&gt;
- 1 Afghanistan         "AFG"  2022                      0.890
- 2 Africa              ""     2022                      3.33 
- 3 Albania             "ALB"  2022                      2.83 
- 4 Algeria             "DZA"  2022                      6.28 
- 5 Andorra             "AND"  2022                      6.04 
- 6 Angola              "AGO"  2022                      5.12 
- 7 Antigua and Barbuda "ATG"  2022                      7.28 
- 8 Argentina           "ARG"  2022                      8.53 
- 9 Armenia             "ARM"  2022                      3.47 
-10 Asia                ""     2022                      6.37 
+   country             code   year pc_ghg_emissions_t
+   &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;              &lt;dbl&gt;
+ 1 Afghanistan         "AFG"  2022              0.890
+ 2 Africa              ""     2022              3.33 
+ 3 Albania             "ALB"  2022              2.83 
+ 4 Algeria             "DZA"  2022              6.28 
+ 5 Andorra             "AND"  2022              6.04 
+ 6 Angola              "AGO"  2022              5.12 
+ 7 Antigua and Barbuda "ATG"  2022              7.28 
+ 8 Argentina           "ARG"  2022              8.53 
+ 9 Armenia             "ARM"  2022              3.47 
+10 Asia                ""     2022              6.37 
 # ℹ 198 more rows</code></pre>
 </div>
 </div>
@@ -391,18 +390,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 208 × 4
-   country             code  per_capita_ghg_emissions_t population
-   &lt;chr&gt;               &lt;chr&gt;                      &lt;dbl&gt;      &lt;dbl&gt;
- 1 Afghanistan         "AFG"                      0.890   41128771
- 2 Africa              ""                         3.33          NA
- 3 Albania             "ALB"                      2.83     2777689
- 4 Algeria             "DZA"                      6.28    44903225
- 5 Andorra             "AND"                      6.04       79824
- 6 Angola              "AGO"                      5.12    35588987
- 7 Antigua and Barbuda "ATG"                      7.28       93763
- 8 Argentina           "ARG"                      8.53    46234830
- 9 Armenia             "ARM"                      3.47     2780469
-10 Asia                ""                         6.37          NA
+   country             code  pc_ghg_emissions_t population
+   &lt;chr&gt;               &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;
+ 1 Afghanistan         "AFG"              0.890   41128771
+ 2 Africa              ""                 3.33          NA
+ 3 Albania             "ALB"              2.83     2777689
+ 4 Algeria             "DZA"              6.28    44903225
+ 5 Andorra             "AND"              6.04       79824
+ 6 Angola              "AGO"              5.12    35588987
+ 7 Antigua and Barbuda "ATG"              7.28       93763
+ 8 Argentina           "ARG"              8.53    46234830
+ 9 Armenia             "ARM"              3.47     2780469
+10 Asia                ""                 6.37          NA
 # ℹ 198 more rows</code></pre>
 </div>
 </div>
@@ -412,21 +411,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 208 × 5
-   country        code  per_capita_ghg_emiss…¹ population pc_projected_ghg_emi…²
-   &lt;chr&gt;          &lt;chr&gt;                  &lt;dbl&gt;      &lt;dbl&gt;                  &lt;dbl&gt;
- 1 Afghanistan    "AFG"                  0.890   41128771                  NA   
- 2 Africa         ""                     3.33          NA                  NA   
- 3 Albania        "ALB"                  2.83     2777689                  NA   
- 4 Algeria        "DZA"                  6.28    44903225                  NA   
- 5 Andorra        "AND"                  6.04       79824                  NA   
- 6 Angola         "AGO"                  5.12    35588987                  NA   
- 7 Antigua and B… "ATG"                  7.28       93763                  NA   
- 8 Argentina      "ARG"                  8.53    46234830                   4.14
- 9 Armenia        "ARM"                  3.47     2780469                  NA   
-10 Asia           ""                     6.37          NA                  NA   
+   country            code  pc_ghg_emissions_t population pc_projected_ghg_emi…¹
+   &lt;chr&gt;              &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 Afghanistan        "AFG"              0.890   41128771                  NA   
+ 2 Africa             ""                 3.33          NA                  NA   
+ 3 Albania            "ALB"              2.83     2777689                  NA   
+ 4 Algeria            "DZA"              6.28    44903225                  NA   
+ 5 Andorra            "AND"              6.04       79824                  NA   
+ 6 Angola             "AGO"              5.12    35588987                  NA   
+ 7 Antigua and Barbu… "ATG"              7.28       93763                  NA   
+ 8 Argentina          "ARG"              8.53    46234830                   4.14
+ 9 Armenia            "ARM"              3.47     2780469                  NA   
+10 Asia               ""                 6.37          NA                  NA   
 # ℹ 198 more rows
-# ℹ abbreviated names: ¹​per_capita_ghg_emissions_t,
-#   ²​pc_projected_ghg_emissions_t</code></pre>
+# ℹ abbreviated name: ¹​pc_projected_ghg_emissions_t</code></pre>
 </div>
 </div>
 </section>
@@ -463,7 +461,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Reducing features on `world` for faster rendering from 99613"</code></pre>
+<pre><code>[1] "Reducing features in `world` for faster rendering from 99613"</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 6296</code></pre>
@@ -473,7 +471,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="CSC3107_Assignment_Seashell_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="CSC3107_Assignment_Seashell_files/figure-html/combine-plot-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
