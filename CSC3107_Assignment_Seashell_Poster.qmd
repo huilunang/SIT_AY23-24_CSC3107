@@ -33,13 +33,13 @@ source("CSC3107_Assignment_Seashell.R")
 
 # Introduction
  
-Climate change is a global issue that has significantly impacted the environment for decades. Reversing the damage caused by human activity, particularly modern industrialization, remains a daunting challenge. The rise in greenhouse gas emissions, largely driven by industrial activities gases[^jeeven_identification_2020], has led to an increase in the Earth's surface temperature, trapping infrared radiation and preventing the planet from cooling down [^tavassoli_effective_2023]. This phenomenon has resulted in more frequent heat waves, intense rainfall, and other extreme climate events. 
+Climate change has significantly impacted the environment for decades, largely due to human activities, particularly modern industrialization. The rise in greenhouse gas emissions from industrial activities[^jeeven_identification_2020] has increased Earth's surface temperature, trapping heat and preventing cooling[^tavassoli_effective_2023]. This has led to more frequent heat waves, intense rainfall, and other extreme climate events.
+\
+\
+Addressing greenhouse gas emissions is more urgent than ever. Communicating their sources and impacts is crucial for raising awareness and encouraging action. In this project, we built on CNN's visualizations of emissions by country[^CNN_article_2024] to highlight contributions to greenhouse gas emissions and emphasize the efforts needed to combat climate change. We developed a visualization of the top 10 greenhouse gas emitters per capita in 2022, providing a more comprehensive and engaging representation of the data.
 
 [^jeeven_identification_2020]: Jeeven Ravi et al., "Identification of Greenhouse Gases Emission Thorough Exploration of The Emission from Different Sectors" 2020 6th International Conference on Computing Engineering and Design (ICCED), 2020, pp. 1-7
 [^tavassoli_effective_2023]: M. Tavassoli et al., "Comparison of effective greenhouse gases and global warming" 2023 8th International Conference on Technology and Energy Management (ICTEM), 2023, pp 1-5
-
-Addressing greenhouse gas emissions is more urgent than ever. Communicating their sources and impacts is crucial for raising awareness and encouraging action. In this project, we built on CNN's visualizations of emissions by country[^CNN_article_2024] to highlight contributions to greenhouse gas emissions and emphasize the efforts needed to combat climate change. We developed a visualization of the top 10 greenhouse gas emitters per capita in 2022, providing a more comprehensive and engaging representation of the data.
-
 [^CNN_article_2024]: https://edition.cnn.com/interactive/2023/12/us/countries-climate-change-emissions-cop28/
 
 # Previous Visualization
@@ -58,28 +58,27 @@ include_graphics("./images/ghgemission_initial.png")
 
 # Strengths
 
-*   The use of a dynamic bubble chart to emphasize on rankings to visualize on the leading countries’ emission contributions in 2022
-*   The timeline graph shown in the visualization makes use of future predictions by 2030 to show the CO2 estimated emissions by country. The height of the charts albeit difficult to see due to the CSS, is to scale for their specific unit.
-*   The visualization uses different hues of the same red colour to describe the intensity of the data.
-*   Shows metric and amount of greenhouse gas emitted by countries outside of the top 20 when bubble is hovered.  
+*   The dynamic bubble chart emphasizes rankings and visualizes leading countries’ emission contributions in 2022, showing metrics and the amount of greenhouse gas emitted, including data for countries outside the top 20 when hovered.
+*   The timeline graph includes future predictions up to 2030 to show estimated CO2 emissions by country, scaled to specific units despite CSS-related visibility issues.
+*   Different hues of red describe the intensity of the data, providing a clear visual distinction.
 
 ```{r}
 #| label: bubble-hover-not-top20
 #| fig-cap: "Zoomed in screenshot of the bubble chart when hovered over to show metric and amount of greenhouse gas emitted by country outside of the top 20"
-#| out-width: "30%"
+#| out-width: "27%"
 
 include_graphics("./images/bubble_hover.png")
 ```
 
 # Suggested Improvements
 
-1.    *More numerical figures and labels* could be used with the  bubble chart and graphs to convey the content more effectively at a glance.
-1.    *Provide a legend* for the bubble chart to show the size of the bubble represents the amount of emissions.
-1.    *Use the choropleth map* to show top 10 emitters of the world and visualize the total greenhouse gas emissions per capita globally. This will highlight the emission contributions of leading countries relative to others, making it easier to identify key emitters.
-1.    *Provide a line to map* the country labels and the emitted amount to the respective country in the choropleth map.
-1.    *Leverage on a bubble plot* to represent the recommended emission reduction for the top 10 countries on top of the choropleth map, where the bubble sizes distinctly represent the required emission reduction for each country.
-1.    *Use a colour palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
-1.    *The integration of bubble plot on the choropleth map combines the information from two graphs* into a single comprehensive visualization.
+*    *More numerical figures and labels* could be used with the  bubble chart and graphs to convey the content more effectively at a glance.
+*    *Provide a legend* for the bubble chart to show the size of the bubble represents the amount of emissions.
+*    *Use the choropleth map* to show top 10 emitters of the world and visualize the total greenhouse gas emissions per capita globally. This will highlight the emission contributions of leading countries relative to others, making it easier to identify key emitters.
+*    *Provide a line to map* the country labels and the emitted amount to the respective country in the choropleth map.
+*    *Leverage on a bubble plot* to represent the recommended emission reduction for the top 10 countries on top of the choropleth map, where the bubble sizes distinctly represent the required emission reduction for each country.
+*    *Use a colour palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
+*    *The integration of bubble plot on the choropleth map combines the information from two graphs* into a single comprehensive visualization.
 
 # Implementation
 
@@ -106,18 +105,22 @@ We used the Quarto publication framework and the R programming language, along w
 ```{r}
 #| label: ghgemission-improved
 #| fig-cap: "Combined total emission per capital & amount of recommended reduction of greenhouse gases."
-#| out-width: "85%"
+#| out-width: "80%"
 
 include_graphics("./images/percap_ghgemission_improved.png")
 ```
 
 # Insights
 
-*   **High Emission Sources:** The top emitters are primarily fossil fuel-rich countries like Qatar, Brunei, Kuwait, UAE, Oman, and Saudi Arabia, along with coal-dependent and industrial nations such as Mongolia, Australia, Canada, and Turkmenistan. These countries' high emissions are driven by extensive oil and gas production, coal usage, and energy-intensive industries.
+*   **High Emission Sources:** The top emitters are primarily fossil fuel-rich countries like Qatar, Brunei, Kuwait, UAE, Oman, and Saudi Arabia, along with coal-dependent and industrial nations such as Mongolia, Australia, Canada, and Turkmenistan. These countries' high emissions are driven by extensive oil and gas production, coal usage, and energy-intensive industries.[^hes_source]
 
 *   **Projected Reduction:** The bubble plot overlay shows the projected emission reduction. However, many countries in the top 10 did not participate in the survey. Consequently, only 3 bubble plots are included to represent the projected reduction of greenhouse gas emissions.
 
-*   **Skewed Data:** The data is skewed towards 70 tonnes due to an outlier, the top emitter, Qatar, while the remaining nine countries fall within the range of 20 to 40 tonnes. This outlier may be attributed to Qatar's emission spike during the World Cup 2022.
+*   **Skewed Data:** The data is skewed towards 70 tonnes due to an outlier, the top emitter, Qatar, while the remaining nine countries fall within the range of 20 to 40 tonnes. This outlier may be attributed to Qatar's emission spike during the World Cup 2022.[^SkewData_source]
+
+[^hes_source]: https://www.straitstimes.com/world/middle-east/to-meet-climate-goals-gulf-countries-will-have-to-overhaul-everything
+
+[^SkewData_source]: https://www.scientificamerican.com/article/the-world-cup-in-qatar-is-a-climate-catastrophe/
 
 # Conclusion
 We successfully implemented all suggested improvements for the non-interactive visualization. By adding numerical figures, labels, and legends, the revised visualisation is more informative. The choropleth map highlights the top 10 emitters and global per capita emissions, making key contributors easy to identify. Lines mapping country labels and emissions enhance clarity, while bubble sizes for recommended reductions and a color palette for emission intensities ensure the visualization is comprehensive and readable.
