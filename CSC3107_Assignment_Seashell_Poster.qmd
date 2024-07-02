@@ -56,7 +56,7 @@ include_graphics("./images/ghgemission_initial.png")
 ```
 
 
-# Appreciated Aspects
+# Strengths
 
 *   The use of a dynamic bubble chart to emphasize on rankings to visualize on the leading countries’ emission contributions in 2022
 *   The timeline graph shown in the visualization makes use of future predictions by 2030 to show the CO2 estimated emissions by country. The height of the charts albeit difficult to see due to the CSS, is to scale for their specific unit.
@@ -98,9 +98,7 @@ We used the Quarto publication framework and the R programming language, along w
 *   *tidyverse* for data transformation, including *ggplot2* for visualization.
 *   *rnaturalearth* for the chrolopleth map.
 *   *ggrepel* provides geoms for overlapping text labels.
-*   *ggtext* <insert description>
-*   *htmltools* <insert description>
-*   *sf* <insert description>
+*   *sf* for geometrical operation purposes
 *   *knitr* for dynamic document generation.
 
 # Improved Visualization
@@ -113,10 +111,13 @@ We used the Quarto publication framework and the R programming language, along w
 include_graphics("./images/percap_ghgemission_improved.png")
 ```
 
-# Further Suggestions For Interactivity
+# Insights
 
-Because our visualization was designed for a poster, interactive features were not included. However, we would like to suggest the following recommendations for enhancing interactivity. Include a time slider to visualize changes in greenhouse gas emissions and reduction targets over different years. This allows users to see trends and progress over time interactively. Enable zoom and pan functionality to allow users to explore specific regions in more detail. This is especially useful for closely examining areas with dense or high-emission data points.
+*   **High Emission Sources:** The top emitters are primarily fossil fuel-rich countries like Qatar, Brunei, Kuwait, UAE, Oman, and Saudi Arabia, along with coal-dependent and industrial nations such as Mongolia, Australia, Canada, and Turkmenistan. These countries' high emissions are driven by extensive oil and gas production, coal usage, and energy-intensive industries.
+
+*   **Projected Reduction:** The bubble plot overlay shows the projected emission reduction. However, many countries in the top 10 did not participate in the survey. Consequently, only 3 bubble plots are included to represent the projected reduction of greenhouse gas emissions.
+
+*   **Skewed Data:** The data is skewed towards 70 tonnes due to an outlier, the top emitter, Qatar, while the remaining nine countries fall within the range of 20 to 40 tonnes. This outlier may be attributed to Qatar's emission spike during the World Cup 2022.
 
 # Conclusion
-
 We successfully implemented all suggested improvements for the non-interactive visualization. By adding numerical figures, labels, and legends, the revised visualisation is more informative. The choropleth map highlights the top 10 emitters and global per capita emissions, making key contributors easy to identify. Lines mapping country labels and emissions enhance clarity, while bubble sizes for recommended reductions and a color palette for emission intensities ensure the visualization is comprehensive and readable.
