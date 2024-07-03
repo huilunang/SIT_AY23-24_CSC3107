@@ -1,0 +1,298 @@
+---
+title: "CSC3107_Assignment_Seashell"
+format: html
+editor: visual
+execute:
+  echo: false
+---
+
+# Visualization
+
+## a. World Emission Chart using World Map
+
+### i. Previous Chart
+
+-   Bubble chart by size to show the ranking of the countries ![Original Total Greenhouse Gas Emissions](original_chart/total_ghg_emissions_bbchart.png){alt="Original Total Greenhouse Gas Emissions"}
+
+### ii. Improved Elements
+
+-   Used a world map with bubble plots to show the data of top per capita GHG emitters and projected reductions.
+-   Used labels to show the ranking of the countries.
+-   Applied a color palette to indicate the intensity of the data.
+-   Used the Behrmann Projection (ESRI:54017) to accurately preserve the relative sizes of areas on the Earth's surface.
+
+> **Note**: European Union is not a country, it is a political and economic union of 27 member states that are located primarily in Europe. The data has been broken up to show as individual state.
+
+### iii. Insights
+
+-   The data is skewed towards 70 tonnes due to an outlier, Qatar, as indicated in the minimap. The remaining nine countries fall within the range of 20 to 40 tonnes.
+
+<hr>
+
+Ensure that the data obtained from open source is clean and free of any invalidity and inefficiencies by checking:
+
+-   Spatial type validity
+-   Number of geospatial data points is \< 10,000
+
+```{r}
+#| label: required-packages2
+#| echo: false
+#| message: false
+#| warning: false
+
+library(cowplot)
+library(ggplot2)
+library(ggtext)
+library(ggrepel)
+library(mapview)
+library(rmapshaper)
+library(rnaturalearth)
+library(knitr)
+library(scales)
+library(sf)
+library(tidyverse)
+
+# Load dataframe from Data Preprocessing file
+purl("CSC3107_Seashell_DataPreprocessing.qmd")
+source("CSC3107_Seashell_DataPreprocessing.R")
+```
+
+```{r}
+#| label: load-world-map
+
+# Get world map data
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+# Check if the polygons in `world` are valid
+all(st_is_valid(world))
+
+# Check the number of spatial features obtained from open source data
+# Recommended to generally have fewer than 10,000 geospatial data points
+if (npts(world) >= 10000) {
+  print(sprintf("Reducing features in `world` for faster rendering from %d", npts(world)))
+  world <- ms_simplify(world)
+}
+
+# Check the number of features in the world data
+npts(world)
+```
+
+```{r}
+#| label: preprocess-world-map
+
+# Define map projection
+map_projection <- "ESRI:54017"
+
+# Merge emissions data with world map and transform
+world <- world |>
+  left_join(ghg_2022_projected_2030, by = c("name" = "country")) |>
+  st_transform(map_projection)
+
+# Sort and add ranking by per capita GHG emissions
+world_simplified <- world |>
+  arrange(desc(pc_ghg_emissions_t)) |>
+  mutate(ranking = row_number()) |>
+  select(
+    ranking,
+    name,
+    code,
+    geometry,
+    pc_ghg_emissions_t,
+    pc_projected_ghg_emissions_t
+  )
+
+# Subset top 10 emitters and calculate label offsets
+top_10 <- head(world_simplified, 10)
+label_offsets <- data.frame(
+  country = top_10$name,
+  offset_x = 0,
+  offset_y = 0
+)
+
+# Merge offsets with simplified world data and calculate centroid coordinates
+world_simplified <-
+  left_join(world_simplified, label_offsets, by = c("name" = "country")) |>
+  mutate(
+    .data = world_simplified,
+    centroid = st_centroid(geometry),
+    x = st_coordinates(centroid)[, 1],
+    y = st_coordinates(centroid)[, 2]
+  )
+
+# Extract details for the first data point among top 10
+top_10 <- subset(world_simplified, ranking <= 10)
+first_data_point <- top_10[1, ]
+```
+
+```{r}
+#| label: plot-world-map
+
+# Set seed to reproduce same settings
+set.seed(1234567890)
+
+# Define earth polygon
+earth <- st_polygon(
+  x = list(
+    cbind(
+      c(rep(-180, 181), rep(180, 181), -180), c(-90:90, 90:-90, -90)
+    )
+  )
+) |>
+  st_sfc() |>
+  st_set_crs(4326) |>
+  st_as_sf()
+
+# Create choropleth map
+main_map <- ggplot(data = world_simplified) +
+  geom_sf(data = earth, fill = "lightblue") +
+  geom_sf(
+    aes(fill = pc_ghg_emissions_t),
+    color = "black",
+    size = 0.2,
+  ) +
+  geom_label_repel(
+    data = top_10,
+    aes(
+      x = x,
+      y = y,
+      label = sprintf("%d. %s", ranking, code)
+    ),
+    size = 3,
+    box.padding = 0,
+    point.padding = 0.5,
+    max.overlaps = Inf,
+    seed = 1234567890,
+    fill = scales::alpha("white", 0.65),
+    label.size = 0.1,
+    fontface = "bold",
+  ) +
+  geom_point(
+    data = filter(top_10, !is.na(pc_projected_ghg_emissions_t)),
+    aes(
+      x = x,
+      y = y,
+      size = pc_projected_ghg_emissions_t
+    ),
+    color = "#800026",
+    alpha = 0.5
+  ) +
+  scale_fill_fermenter(
+    breaks = pretty_breaks(n = 8),
+    palette = "YlOrRd",
+    direction = 1,
+    name = "Per Capita GHG Emissions (t)"
+  ) +
+  scale_size(
+    range = c(2.8, 10),
+    name = "Projected Reduction (%)"
+  ) +
+  guides(
+    fill = guide_colorbar(
+      title.position = "top",
+      title.hjust = 0.5,
+      label.position = "bottom"
+    ),
+    size = guide_legend(
+      title.position = "top",
+      title.hjust = 0.5,
+      label.position = "bottom"
+    )
+  ) +
+  labs(
+    title = "<b>2022 Per Capita GHG Emissions and 2030 Projected Reduction</b>",
+    subtitle = "<b>Top 10 Emitters in tonnes (t)</b>",
+    caption = "Source: Our World in Data",
+    x = NULL,
+    y = NULL
+  ) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.frame = element_rect(),
+    legend.text = element_text(size = 8.5),
+    legend.title = element_text(size = 10),
+    legend.position = "bottom",
+    legend.key.width = unit(0.6, "cm"),
+    legend.key.height = unit(0.6, "cm"),
+    text = element_text(size = 12),
+    plot.title = element_markdown(),
+    plot.subtitle = element_markdown(),
+    plot.margin = unit(c(0, 0, 0, 0), "cm"),
+    panel.background = element_blank(),
+  )
+```
+
+```{r}
+#| label: plot-mini-map
+
+# Define the zoom factor and the first data point
+zoom_factor <- 5
+first_data_point <- top_10[1, ]
+zoom_to <- c(first_data_point$x, first_data_point$y)
+
+# Calculate the spans in the Behrmann projection
+C <- 40075016.686 # Circumference of the Earth in meters
+x_span <- C / 2^zoom_factor
+y_span <- C / 2^(zoom_factor + 1)
+
+# Calculate bounds in the Behrmann projection
+x_bounds <- c(zoom_to[1] - x_span / 2, zoom_to[1] + x_span / 2)
+y_bounds <- c(zoom_to[2] - y_span / 2, zoom_to[2] + y_span / 2)
+
+# Create the mini-map
+mini_map <- ggplot() +
+  geom_sf(data = earth, fill = "lightblue") +
+  geom_sf(
+    data = world_simplified, aes(fill = pc_ghg_emissions_t),
+    color = "black",
+    size = 0.2
+  ) +
+  coord_sf(xlim = x_bounds, ylim = y_bounds, crs = map_projection) +
+  geom_label(
+    data = data.frame(
+      x = zoom_to[1] - 0.095 * 100000, # Adjust the offset to meters
+      y = zoom_to[2] + 2.000 * 100000,
+      label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)
+    ),
+    aes(x = x, y = y, label = label),
+    size = 2.5,
+    fill = scales::alpha("white", 0.65),
+    label.size = 0.1,
+    fontface = "bold"
+  ) +
+  scale_fill_fermenter(
+    breaks = pretty_breaks(n = 9),
+    palette = "YlOrRd",
+    direction = 1
+  ) +
+  theme_void() +
+  theme(
+    text = element_text(size = 5),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+    plot.title = element_markdown(),
+    plot.subtitle = element_markdown(),
+    axis.text = element_blank(),
+    axis.title = element_blank()
+  ) +
+  guides(
+    fill = "none"
+  )
+```
+
+```{r}
+#| label: combine-plot
+
+# Combine the main map and the mini-map using cowplot
+combined_plot <-
+  cowplot::ggdraw(main_map) +
+  cowplot::draw_plot(
+    mini_map,
+    x = 0.795,
+    y = 0.315,
+    width = 0.17,
+    height = 0.090
+  )
+
+# Display the combined plot
+combined_plot
+```
