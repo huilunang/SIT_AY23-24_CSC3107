@@ -60,10 +60,11 @@ Addressing greenhouse gas emissions is more urgent than ever. Communicating thei
 # Previous Visualization
 
 ```{r}
-#| label: ghgemission-initial
-#| fig-cap: 
-#| - "Percentage of emissions reduction needed by 2030, among current top emitters and Total greenhouse gas emissions by country in 2022"
-#| out-width: "85%"
+#| label: ghg-emission-initial
+#| fig-cap: "Emissions reduction needed by 2030 for top emitters and 2022 greenhouse gas emissions by country"
+#| fig-width: 10
+#| fig-height: 8
+#| out-width: "100%"
 
 include_graphics("./images/combined_previous.jpg")
 ```
@@ -77,7 +78,7 @@ include_graphics("./images/combined_previous.jpg")
 
 ```{r}
 #| label: bubble-hover-not-top20
-#| fig-cap: "Zoomed in screenshot of the bubble chart when hovered over to show metric and amount of greenhouse gas emitted by country outside of the top 20"
+#| fig-cap: "Close-up of bubble chart displaying greenhouse gas emissions by countries outside the top 20, showing metric and emission amount on hover"
 #| out-width: "30%"
 
 include_graphics("./images/bubble_hover.png")
@@ -90,29 +91,24 @@ include_graphics("./images/bubble_hover.png")
 *    *Use the choropleth map* to show top 10 emitters of the world and visualize the greenhouse gas emissions per capita globally. This will highlight the emission contributions of leading countries relative to others, making it easier to identify key emitters.
 *    *Provide a line to map* the country labels to the respective country in the choropleth map.
 *    *Leverage on a bubble plot* to represent the predicted emission reduction for the top 10 countries on top of the choropleth map, where the bubble sizes distinctly represent the required emission reduction for each country.
-*    *Use a colour palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
+*    *Use a color palette* to indicate the intensity of each country's emission contribution, providing a clear visual difference.
 *    *The integration of bubble plot on the choropleth map combines the information from two graphs* into a single comprehensive visualization.
 
 # Implementation
 
 ## Data
-*   Data on CO2 and Greenhouse Gas Emissions by Our World in Data[^co2_ghg_owd_2024]
-*   Annual Greenhouse Gas Emissions by Our World in Data[^ghg_owd_2024]
-*   Greenhouse Gases Per Capita by Our World in Data[^ghg_percap_owd_2024]
 
-## Data Processing for map visualization
-*   We first processed the data used to create the ggplot2 visualization. The data was cleaned and transformed to ensure it was suitable for the visualization. The data was then merged with the world map data to create the choropleth map.
-*   Finally the minimap was created and overlaid, and the two plots were combined using cowplot to create the final visualization.
+The datasets used include per capita greenhouse gas emissions in CO2 equivalents[^ghg_percap_owd_2022], population[^population_2022], and projected reductions in total greenhouse gas emissions for 2030[^ghg_2022_projected_2030]. The population data is used to calculate the per capita projected reduction data, which is then used for creating the bubble plot.
 
-[^co2_ghg_owd_2024]: https://github.com/owid/co2-data?tafb=readme-ov-file
-[^ghg_owd_2024]: https://ourworldindata.org/grapher/total-ghg-emissions?tab=table
-[^ghg_percap_owd_2024]: https://ourworldindata.org/grapher/per-capita-ghg-emissions?tab=table
+[^ghg_percap_owd_2022]: https://ourworldindata.org/grapher/per-capita-ghg-emissions?tab=table
+[^population_2022]: https://data.worldbank.org/indicator/SP.POP.TOTL?end=2022&start=2022&view=bar
+[^ghg_2022_projected_2030]:
+https://climateactiontracker.org/cat-data-explorer/country-emissions
 
 ## Software
 We used the Quarto publication framework and the R programming language, along with the following third-party packages:
 
-*   *tidyverse* for data transformation.
-*   *ggplot2* for visualization.
+*   *tidyverse* for data transformation and *ggplot2* for visualization.
 *   *rnaturalearth* for the choropleth map.
 *   *ggrepel* provides geoms for overlapping text labels.
 *   *ggtext* for markdown elements.
@@ -185,7 +181,7 @@ first_data_point <- top_10[1, ]
 ```{r}
 #| label: create-main-map
 
-# Set colour palette, last of YlOrRd
+# Set color palette, last of YlOrRd
 bubble_color <- "#800026"
 
 # Set seed to reproduce same settings
@@ -218,14 +214,15 @@ main_map <- ggplot(data = world_simplified) +
       y = y + offset_y,
       label = sprintf("%d. %s", ranking, code)
     ),
-    size = 1.5,
-    box.padding = 0.7,
+    size = 5,
+    box.padding = 0.635,
     point.padding = 0.1,
     max.overlaps = Inf,
     seed = 1234567890,
     fill = scales::alpha("white", 0.85),
-    label.size = 0.1,
-    fontface = "bold"
+    label.size = 0.5,
+    fontface = "bold",
+    segment.size = 1.25
   ) +
   geom_point(
     data = filter(top_10, !is.na(pc_projected_ghg_emissions_t)),
@@ -244,8 +241,8 @@ main_map <- ggplot(data = world_simplified) +
     name = "Per Capita GHG Emissions (t)"
   ) +
   scale_size(
-    range = c(1, 5),
-    name = "Projected Reduction (%)"
+    range = c(3.8, 10),
+    name = "Projected Reduction (%)",
   ) +
   guides(
     fill = guide_colorbar(
@@ -260,7 +257,7 @@ main_map <- ggplot(data = world_simplified) +
     )
   ) +
   labs(
-    title = "<b>2022 Per Capita GHG Emissions <br> and 2030 Projected Reduction</b>",
+    title = "<b>2022 Per Capita GHG Emissions and 2030 Projected Reduction</b>",
     subtitle = "<b>Top 10 Emitters in tonnes (t)</b>",
     caption = "Source: Our World in Data",
     x = NULL,
@@ -271,12 +268,12 @@ main_map <- ggplot(data = world_simplified) +
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     legend.frame = element_rect(),
-    legend.text = element_text(size = 6.5),
-    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    legend.title = element_text(size = 12),
     legend.position = "bottom",
-    legend.key.width = unit(1, "cm"),
-    legend.key.height = unit(0.4, "cm"),
-    text = element_text(size = 12),
+    legend.key.width = unit(1.5, "cm"),
+    legend.key.height = unit(1, "cm"),
+    text = element_text(size = 14),
     plot.title = element_markdown(),
     plot.subtitle = element_markdown()
   )
@@ -286,14 +283,14 @@ main_map <- ggplot(data = world_simplified) +
 #| label: create-mini-map
 
 # Define the zoom factor and the first data point
-zoom_factor <- 5
+zoom_factor <- 5.5
 first_data_point <- top_10[1, ]
 zoom_to <- c(first_data_point$x, first_data_point$y)
 
 # Calculate the spans in the Behrmann projection
-C <- 40075016.686 # Circumference of the Earth in meters
-x_span <- C / 2^zoom_factor
-y_span <- C / 2^(zoom_factor + 1)
+circumference <- 40075016.686 # Circumference of the Earth in meters
+x_span <- circumference / 2^zoom_factor
+y_span <- circumference / 2^(zoom_factor + 1)
 
 # Calculate bounds in the Behrmann projection
 x_bounds <- c(zoom_to[1] - x_span / 2, zoom_to[1] + x_span / 2)
@@ -311,12 +308,12 @@ mini_map <- ggplot() +
   geom_label(
     data = data.frame(
       x = zoom_to[1] - 0.095 * 100000, # Adjust the offset to meters
-      y = zoom_to[2] + 2.000 * 100000,
+      y = zoom_to[2] + 1.500 * 100000,
       label = sprintf("%d. %s", first_data_point$ranking, first_data_point$code)
     ),
     aes(x = x, y = y, label = label),
-    size = 2.5,
-    fill = scales::alpha("white", 0.65),
+    size = 3.5,
+    fill = scales::alpha("white", 0.75),
     label.size = 0.1,
     fontface = "bold"
   ) +
@@ -329,7 +326,7 @@ mini_map <- ggplot() +
   theme_void() +
   theme(
     text = element_text(size = 5),
-    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.6),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1.8),
     plot.title = element_markdown(),
     plot.subtitle = element_markdown(),
     axis.text = element_blank(),
@@ -344,18 +341,20 @@ combined_plot <-
   cowplot::ggdraw(main_map) +
   cowplot::draw_plot(
     mini_map,
-    x = 0.158,
-    y = 0.346,
-    width = 0.17,
-    height = 0.090
+    x = 0.752,
+    y = 0.268,
+    width = 0.200,
+    height = 0.120
   )
 ```
 
 # Improved Visualization
 
 ```{r}
-#| label: ghgemission-improved
-#| fig-cap: "Combined total emission per capital & amount of predicted reduction of greenhouse gases."
+#| label: ghg-emission-improved
+#| fig-cap: "Combined total emission per capital and amount of predicted reduction of greenhouse gases."
+#| fig-width: 10
+#| fig-height: 6
 #| out-width: "100%"
 
 # Display the combined plot
@@ -368,11 +367,11 @@ combined_plot
 
 *   **Projected Reduction:** The bubble plot overlay shows the projected emission reduction. However, many countries in the top 10 did not participate in the survey. Consequently, only 3 bubble plots are included to represent the projected reduction of greenhouse gas emissions.
 
-*   **Skewed Data:** The data is skewed towards 70 tonnes due to an outlier, the top emitter, Qatar, while the remaining nine countries fall within the range of 20 to 40 tonnes. This outlier may be attributed to Qatar's emission spike during the World Cup 2022.[^SkewData_source]
+*   **Skewed Data:** The data is skewed towards 70 tonnes due to an outlier, the top emitter, Qatar, while the remaining nine countries fall within the range of 20 to 40 tonnes. This outlier may be attributed to Qatar's emission spike during the World Cup 2022.[^skew_data_source]
 
 [^hes_source]: https://www.straitstimes.com/world/middle-east/to-meet-climate-goals-gulf-countries-will-have-to-overhaul-everything
 
-[^SkewData_source]: https://www.scientificamerican.com/article/the-world-cup-in-qatar-is-a-climate-catastrophe/
+[^skew_data_source]: https://www.scientificamerican.com/article/the-world-cup-in-qatar-is-a-climate-catastrophe/
 
 # Conclusion
-We successfully implemented all suggested improvements for the non-interactive visualization. By adding numerical figures, labels, and legends, the revised visualisation is more informative. The choropleth map highlights the top 10 emitters and global per capita emissions, making key contributors easy to identify. Lines mapping country labels and emissions enhance clarity, while bubble sizes for predicted reductions and a color palette for emission intensities ensure the visualization is comprehensive and readable.
+We successfully implemented all suggested improvements for the non-interactive visualization. By adding numerical figures, labels, and legends, the revised visualization is more informative. The choropleth map highlights the top 10 emitters and global per capita emissions, making key contributors easy to identify. Lines mapping country labels and emissions enhance clarity, while bubble sizes for predicted reductions and a color palette for emission intensities ensure the visualization is comprehensive and readable.
