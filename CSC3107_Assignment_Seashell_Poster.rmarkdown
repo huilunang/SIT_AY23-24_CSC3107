@@ -46,6 +46,7 @@ purl("CSC3107_Seashell_DataPreprocessing.qmd")
 source("CSC3107_Seashell_DataPreprocessing.R")
 ```
 
+
 # Introduction
  
 Climate change has significantly impacted the environment for decades, largely due to human activities, particularly modern industrialization. The rise in greenhouse gas emissions from industrial activities[^jeeven_identification_2020] has increased Earth's surface temperature, trapping heat and preventing cooling[^tavassoli_effective_2023]. This has led to more frequent heat waves, intense rainfall, and other extreme climate events.
@@ -59,6 +60,7 @@ Addressing greenhouse gas emissions is more urgent than ever. Communicating thei
 
 # Previous Visualization
 
+
 ```{r}
 #| label: ghgemission-initial
 #| fig-cap: 
@@ -69,11 +71,13 @@ include_graphics("./images/combined_previous.jpg")
 ```
 
 
+
 # Strengths
 
 *   The dynamic bubble chart emphasizes rankings and visualizes leading countries’ emission contributions in 2022, showing metrics and the amount of greenhouse gas emitted, including data for countries outside the top 20 when hovered.
 *   The bar graph includes future predictions up to 2030 to show estimated CO2 emissions by country, scaled to specific units despite CSS-related visibility issues.
 *   Different hues of red describe the intensity of the data, providing a clear visual distinction.
+
 
 ```{r}
 #| label: bubble-hover-not-top20
@@ -82,6 +86,7 @@ include_graphics("./images/combined_previous.jpg")
 
 include_graphics("./images/bubble_hover.png")
 ```
+
 
 # Suggested Improvements
 
@@ -122,6 +127,7 @@ We used the Quarto publication framework and the R programming language, along w
 *   *sf* for geometrical operation purposes.
 *   *knitr* for dynamic document generation.
 *   *cowplot* for combining multiple plots into a single visualization.
+
 
 
 ```{r}
@@ -351,7 +357,9 @@ combined_plot <-
   )
 ```
 
+
 # Improved Visualization
+
 
 ```{r}
 #| label: ghgemission-improved
@@ -361,6 +369,7 @@ combined_plot <-
 # Display the combined plot
 combined_plot
 ```
+
 
 # Insights
 
