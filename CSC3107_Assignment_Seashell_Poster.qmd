@@ -1,5 +1,5 @@
 ---
-title: Visualizing Countries Contributions to Climate Change (Greenhouse Gases Emission)
+title: Visualizing Countries' Contributions to Climate Change (Greenhouse Gas Emissions)
 format: 
   poster-typst:
     size: "33x23"
@@ -8,7 +8,7 @@ format:
     
     departments: "Information and Communication Technologies"
     
-    institution-logo: "./images/sit-logo.png"
+    institution-logo: "./image/sit-logo.png"
     
     footer-text: "University Of Glasgow"
     
@@ -66,7 +66,7 @@ Addressing greenhouse gas emissions is more urgent than ever. Communicating thei
 #| fig-height: 8
 #| out-width: "100%"
 
-include_graphics("./images/combined_previous.jpg")
+include_graphics("./image/combined_previous.jpg")
 ```
 
 
@@ -81,7 +81,7 @@ include_graphics("./images/combined_previous.jpg")
 #| fig-cap: "Close-up of bubble chart displaying greenhouse gas emissions by countries outside the top 20, showing metric and emission amount on hover"
 #| out-width: "30%"
 
-include_graphics("./images/bubble_hover.png")
+include_graphics("./image/bubble_hover.png")
 ```
 
 # Suggested Improvements
