@@ -125,17 +125,8 @@ We used the Quarto publication framework and the R programming language, along w
 
 
 ```{r}
-#| label: map-processing
-```
+#| label: load-world-map
 
-# Improved Visualization
-
-```{r}
-#| label: ghgemission-improved
-#| fig-cap: "Combined total emission per capital & amount of recommended reduction of greenhouse gases."
-#| out-width: "100%"
-
-# include_graphics("./images/percap_ghgemission_improved.png")
 # Get world map data
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
@@ -144,7 +135,9 @@ world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 if (npts(world) >= 10000) {
   world <- ms_simplify(world)
 }
+```
 
+```{r}
 # Define map projection
 map_projection <- "ESRI:54017"
 
@@ -187,6 +180,10 @@ world_simplified <-
 # Extract details for the first data point among top 10
 top_10 <- subset(world_simplified, ranking <= 10)
 first_data_point <- top_10[1, ]
+```
+
+```{r}
+#| label: create-main-map
 
 # Set colour palette, last of YlOrRd
 bubble_color <- "#800026"
@@ -222,7 +219,7 @@ main_map <- ggplot(data = world_simplified) +
       label = sprintf("%d. %s", ranking, code)
     ),
     size = 1.5,
-    box.padding = 0.5,
+    box.padding = 0.7,
     point.padding = 0.1,
     max.overlaps = Inf,
     seed = 1234567890,
@@ -283,6 +280,10 @@ main_map <- ggplot(data = world_simplified) +
     plot.title = element_markdown(),
     plot.subtitle = element_markdown()
   )
+```
+
+```{r}
+#| label: create-mini-map
 
 # Define the zoom factor and the first data point
 zoom_factor <- 5
@@ -348,6 +349,14 @@ combined_plot <-
     width = 0.17,
     height = 0.090
   )
+```
+
+# Improved Visualization
+
+```{r}
+#| label: ghgemission-improved
+#| fig-cap: "Combined total emission per capital & amount of predicted reduction of greenhouse gases."
+#| out-width: "100%"
 
 # Display the combined plot
 combined_plot
