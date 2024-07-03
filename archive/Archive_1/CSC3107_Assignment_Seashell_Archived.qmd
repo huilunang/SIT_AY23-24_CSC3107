@@ -92,7 +92,7 @@ library(tidyverse)
 #| label: dataset-part-e-iii-2
 
 # Read the CSV file
-total_ghg <- read.csv("total_ghg_dataset.csv")
+total_ghg <- read.csv("../../dataset/total_ghg_dataset.csv")
 
 # Convert to tibble
 total_ghg <- as_tibble(total_ghg)
@@ -106,7 +106,7 @@ print(total_ghg)
 #| label: dataset-part-e-iii-3
 #| 
 # Read the CSV file
-per_capita_ghg <- read.csv("per_capita_ghg_dataset.csv")
+per_capita_ghg <- read.csv("../../dataset/per_capita_ghg_dataset.csv")
 
 # Convert to tibble
 per_capita_ghg <- as_tibble(per_capita_ghg)
@@ -119,7 +119,7 @@ print(per_capita_ghg)
 ```{r}
 #| label: dataset-part-e-ii-2
 
-analysis_ghg <- read.csv("ghg_emission_analysis_dataset.csv")
+analysis_ghg <- read.csv("../../dataset/ghg_emission_analysis_dataset.csv")
 
 analysis_ghg <- as_tibble(analysis_ghg)
 

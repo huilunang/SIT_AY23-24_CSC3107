@@ -120,4 +120,3 @@ ghg_2022_projected_2030 <- ghg_2022 |>
   select(country, code, pc_ghg_emissions_t, population, pc_projected_ghg_emissions_t)
 
 ghg_2022_projected_2030
-
